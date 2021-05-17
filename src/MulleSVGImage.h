@@ -1,21 +1,33 @@
-#import "UIImage.h"
+#ifdef __has_include
+# if __has_include( "UIImage.h")
+#  import "UIImage.h"
+# endif
+#endif
 
-#import "CGGeometry.h"
-
+#import "import.h"
 
 struct NSVGimage;
 
 
+//
 // SVGImage keeps a copy of the original SVG by default (if available)
-@interface MulleSVGImage : UIImage
+// subclass from MulleVectorImage
+//
+@interface MulleSVGImage : UIImage <CGVectorImage>
 {
-	struct NSVGimage   *_NSVGImage;
+   struct mulle_allocator   *_allocator;
 }
 
-- (instancetype) initWithNSVGImage:(struct NSVGimage *) image
-                         fileCData:(struct mulle_data) data
-                         allocator:(struct mulle_allocator *) allocator;
+@property( readonly) struct NSVGimage   *NSVGImage;
 
-- (struct NSVGimage *) NSVGImage;
+// svg encoded data
++ (instancetype) newWithFileCData:(struct mulle_data) data
+                    sharingObject:(id) sharingObject
+                        allocator:(struct mulle_allocator *) allocator;
+
+
+// image will not be freed if allocator is NULL
+- (instancetype) initWithNSVGImage:(struct NSVGimage *) image
+                         allocator:(struct mulle_allocator *) allocator;
 
 @end

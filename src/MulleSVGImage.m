@@ -1,11 +1,21 @@
-#import "import-private.h"
-
 #import "MulleSVGImage.h"
 
-#import "nanovg.h"
+#import "import-private.h"
+
 #import "nanosvg.h"
 #import <errno.h>
 #import <stdio.h>
+
+
+
+static NVGcolor getSVGColor( uint32_t color)
+{
+   return nvgRGBA(
+      (color >> 0) & 0xff,
+      (color >> 8) & 0xff,
+      (color >> 16) & 0xff,
+      (color >> 24) & 0xff);
+}
 
 /*
  * the nsvg parser modifies the data and needs a trailing zero.
@@ -15,32 +25,17 @@
  */
 @implementation MulleSVGImage
 
+static const struct mulle_allocator   nsvgAllocator;
 
-- (instancetype) initWithNSVGImage:(struct NSVGimage *) image
-                         fileCData:(struct mulle_data) data
+
++ (instancetype) newWithFileCData:(struct mulle_data) data
+                     sharingObject:(id) sharingObject
                          allocator:(struct mulle_allocator *) allocator
 {
-   if( ! image)
-   {
-      [self release];
-      return( nil);
-   }
-
-   self = [super initWithFileCData:data
-                             allocator:allocator];
-   assert( self);
-
-   _NSVGImage = image;  // ownership transfer
-   return( self);
-}
-
-
-- (instancetype) initWithFileCData:(struct mulle_data) data
-                         allocator:(struct mulle_allocator *) allocator
-{
-   NSVGimage   *image;
-   BOOL        hasZero;
-   char        *tmp;
+   MulleSVGImage      *obj;
+   NSVGimage          *image;
+   BOOL               hasZero;
+   char               *tmp;
 
    if( ! data.bytes || ! data.length)
    {
@@ -56,27 +51,48 @@
    if( ! hasZero)
       tmp[ data.length] = 0;
 
-   image = nsvgParse( tmp, "px", 96.0);
+   // parser is destructive, so we give it a copy
+   image = nsvgParse( tmp, "px", 96.0);   // make this flexible
    mulle_free( tmp);
 
-   self = [self initWithNSVGImage:image
-                        fileCData:data
-                        allocator:allocator];
-   return( self);
+   // check that parser sets errno again
+   if( ! image)
+   {
+//      errno = EACCESS;
+      return( nil);
+   }
+
+   obj = [self new];
+   obj->_fileDataSharingObject = [sharingObject retain];
+   obj->_fileData              = data;
+   obj->_fileDataAllocator     = allocator;
+   obj->_fileEncoding          = UIImageDataEncodingSVG;
+   obj->_allocator             = (void *) &nsvgAllocator;
+   obj->_NSVGImage             = image;
+
+   return( obj);
 }
 
 
-- (struct NSVGimage *) NSVGImage
+- (instancetype) initWithNSVGImage:(struct NSVGimage *) image
+                         allocator:(struct mulle_allocator *) allocator
 {
-   return( _NSVGImage);
+   if( ! image)
+   {
+      [self release];
+      return( nil);
+   }
+
+   _NSVGImage = image;
+   _allocator = allocator;
+   return( self);
 }
 
 
 - (void) dealloc
 {
-   nsvgDelete( _NSVGImage);
-   if( _fileDataAllocator)
-      mulle_allocator_free( _fileDataAllocator, _fileData.bytes);
+   if( _allocator == &nsvgAllocator)
+      nsvgDelete( _NSVGImage);
    [super dealloc];
 }
 
@@ -98,14 +114,15 @@
 }
 
 
-- (CGRect) visibleBounds
+- (CGRect) bounds
 {
-	NSVGshape  *shape;
-   CGRect     bounds;
-   CGRect     box;
-   CGFloat    overdraw;
+	NSVGshape   *shape;
+   CGRect      bounds;
+   CGRect      box;
+   CGFloat     overdraw;
 
-   bounds = CGRectNull;
+   bounds = CGRectZero;
+
 	for( shape = _NSVGImage->shapes; shape != NULL; shape = shape->next)
 	{
 	   if( ! (shape->flags & NSVG_FLAGS_VISIBLE))
@@ -133,6 +150,73 @@
                      bounds.size.height);
 #endif
    return( bounds);
+}
+
+
+- (void) drawRect:(CGRect) rect
+     cornerRadius:(CGFloat) cornerRadius
+            alpha:(CGFloat) alpha
+          context:(CGContext *) context
+{
+   float               *p;
+   NSVGpath            *path;
+   NSVGshape           *shape;
+   CGColorRef          color;
+   CGPoint             scale;
+   CGRect              rect;
+   int                 i;
+   NVGcontext          *vg;
+   CGAffineTransform   xform;
+
+   assert( cornerRadius = 0.0);  // we can't do this for vector
+
+   vg = MulleContextGetNVGContext( context);
+
+   xform = MulleAffineTransformMakeProjection( rect, [self bounds]);
+   nvgSave( vg);
+   {
+      nvgTransform( vg, xform.a, xform.b, xform.c, xform.d, xform.tx, xform.ty);
+
+      nvgBezierTessellation( vg, NVG_TESS_AFD); // patched nanovg function
+
+      for( shape = _NSVGImage->shapes; shape != NULL; shape = shape->next)
+      {
+         if( ! (shape->flags & NSVG_FLAGS_VISIBLE))
+            continue;
+
+         nvgStrokeWidth( vg, shape->strokeWidth);
+
+         color = getSVGColor( shape->fill.color);
+         color = MulleMakeColorWithColorAndAlpha( color, CGColorGetAlpha( color) * alpha);
+         nvgFillColor( vg, color);
+
+         color = getSVGColor( shape->stroke.color);
+         color = MulleMakeColorWithColorAndAlpha( color, CGColorGetAlpha( color) * alpha);
+         nvgStrokeColor( vg, color);
+
+         for( path = shape->paths; path != NULL; path = path->next)
+         {
+            nvgBeginPath( vg);
+
+            nvgMoveTo( vg, path->pts[0], path->pts[1]);
+            for (i = 0; i < path->npts-1; i += 3)
+            {
+               p = &path->pts[i*2];
+               nvgBezierTo( vg, p[2], p[3], p[4], p[5], p[6], p[7]);
+            }
+
+            if( path->closed)
+               nvgLineTo( vg, path->pts[0], path->pts[1]);
+
+            if( shape->fill.type)
+               nvgFill( vg);
+
+            if( shape->stroke.type)
+               nvgStroke( vg);
+         }
+      }
+   }
+   nvgRestore( vg);
 }
 
 @end

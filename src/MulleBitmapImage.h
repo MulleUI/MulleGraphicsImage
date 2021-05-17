@@ -1,53 +1,61 @@
-#import "_MulleBitmapImage.h"
+//
+//  MulleBitmapImage.m
+//  MulleUIImage
+//
+//  Copyright (c) 2021 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2021 Codeon GmbH.
+//  All rights reserved.
+//
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//
+//  Redistributions of source code must retain the above copyright notice, this
+//  list of conditions and the following disclaimer.
+//
+//  Redistributions in binary form must reproduce the above copyright notice,
+//  this list of conditions and the following disclaimer in the documentation
+//  and/or other materials provided with the distribution.
+//
+//  Neither the name of Mulle kybernetiK nor the names of its contributors
+//  may be used to endorse or promote products derived from this software
+//  without specific prior written permission.
+//
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+//  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+//  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+//  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+//  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+//  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+//  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+//  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+//  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+//  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//  POSSIBILITY OF SUCH DAMAGE.
+//
+#ifdef __has_include
+# if __has_include( "UIImage.h")
+#  import "UIImage.h"
+# endif
+#endif
 
-#import "CGGeometry.h"
-
-
+#import "import.h"
 
 
 //
-// A bitmap image is not yet a texture, when loaded. So you can use it
-// without a NVG context. By default we keep the original incoming data
-// so when asked for it, we do not suffer back and forth compression lossage
-// Everything is RGBA currently
-@interface MulleBitmapImage : _MulleBitmapImage < NSCopying>
+// MulleBitmapImage should be for all intents and purposes be immutable
+// if youw want mutability, use a subclass (and block copying and
+// sharing methods)
+//
+@interface MulleBitmapImage : UIImage <CGBitmapImage>
 {
-   id         _imageSharingObject;
-   BOOL       _dontFreeImage;
+   struct mulle_allocator   *_allocator;
 }
+@property( readonly) struct MulleBitmapInfo   bitmapInfo;
+@property( readonly) struct mulle_data        decodedCData;
 
-// methods with RGBA are unwrapped, uncompressed binary RGBA data
-- (instancetype) initWithFileCData:(struct mulle_data) data
-                         allocator:(struct mulle_allocator *) allocator
-                     nvgImageFlags:(int) flags;
-
-// Other methods expect PNG or JPG data
-                // const meaning readonly memory
-- (instancetype) initWithConstRGBA:(const void *) bytes
-                        bitmapSize:(mulle_bitmap_size) bitmapSize
-                     nvgImageFlags:(int) flags;
-- (instancetype) initWithConstRGBA:(const void *) bytes
-                        bitmapSize:(mulle_bitmap_size) bitmapSize;
-
-- (instancetype) initWithRGBACData:(struct mulle_data) data
-                        bitmapSize:(mulle_bitmap_size) bitmapSize
-                         allocator:(struct mulle_allocator *) allocator
-                     nvgImageFlags:(int) flags;
-
-- (instancetype) initWithContentsOfFileWithFileRepresentationString:(char *) s
-                                                      nvgImageFlags:(int) flags;
-
-- (BOOL) writeToBMPFileWithSystemRepresentation:(char *) filename;
-
-
-- (mulle_int_size) intSize;
-
-
-// derive and image with different flags for NVG,
-- (UIImage *) imageWithNVGImageFlags:(int) flags;
-
-- (void *) bytes;
++ (instancetype) newWithFileCData:(struct mulle_data) data
+                    sharingObject:(id) sharingObject
+                        allocator:(struct mulle_allocator *) allocator;
 
 @end
-
-enum UIImageDataEncoding   MulleBitmapImageDataEncodingFromCData(struct mulle_data data);

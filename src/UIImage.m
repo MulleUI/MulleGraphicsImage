@@ -1,46 +1,100 @@
 #import "UIImage.h"
 
-#import "CGContext.h"
+#import "MulleSVGImage.h"
+#import "MulleBitmapImage.h"
+
+#import "import-private.h"
+
+#include <unistd.h>  // for ssize_t
+
+enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
+{
+   // stb can't do this, because stbi__context is unavailable as are the
+   // various test methods
+
+   // https://en.wikipedia.org/wiki/Portable_Network_Graphics
+   static uint8_t   png_header[] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0xA };
+   uint8_t          *start;
+   uint8_t          *end;
+
+   if( data.length > sizeof( png_header) &&
+      ! memcmp( data.bytes, png_header, sizeof( png_header)))
+   {
+      return( UIImageDataEncodingPNG);
+   }
+
+   // https://stackoverflow.com/questions/4550296/how-to-identify-contents-of-a-byte-is-a-jpeg
+   if( data.length > 4)
+   {
+
+      if( ! strncmp( data.bytes, "<svg", 4))
+         return( UIImageDataEncodingSVG);
+
+      start = data.bytes;
+      end   = &start[ data.length];
+      if( start[ 0] == 0xFF && start[ 1] == 0xD8 &&
+          end[ -2] == 0xFF && end[ -1] == 0xD9)
+      {
+         return( UIImageDataEncodingJPG);
+      }
+
+      if( start[ 0] == 'B' && start[ 1] == 'M')
+         return( UIImageDataEncodingBMP);
+   }
+
+   return( UIImageDataEncodingUnknown);
+}
+
+
+
+
+@implementation UIImage( MulleImageLayer)
+
+#pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
+
+- (Class) preferredLayerClass
+{
+	return( [MulleImageLayer class]);
+}
+
+@end
 
 
 @implementation UIImage
 
+- (instancetype) initWithFileCData:(struct mulle_data) data
+                     sharingObject:(id) sharingObject
+                         allocator:(struct mulle_allocator *) allocator
+{
+   // currently hardcoded: future plugin architecture for subclasses
+   // don't have NSNotificationCenter here yet
+   enum UIImageDataEncoding   encoding;
+
+   encoding  = UIImageDataEncodingFromCData( data);
+   if( encoding == UIImageDataEncodingSVG)
+      return( [MulleSVGImage newWithFileCData:data
+                                sharingObject:sharingObject
+                                     allocator:allocator]);
+   return( [MulleBitmapImage newWithFileCData:data
+                                sharingObject:sharingObject
+                                    allocator:allocator]);
+}
 
 - (instancetype) initWithFileCData:(struct mulle_data) data
                          allocator:(struct mulle_allocator *) allocator
 {
-   _fileData          = data;
-   _fileDataAllocator = allocator;
-   _fileEncoding      = UIImageDataEncodingFromCData( data);
-
-   return( self);
+   return( [self initWithFileCData:data
+                     sharingObject:nil
+                         allocator:allocator]);
 }
-
-
-- (instancetype) initWithConstantBytes:(const void *) bytes
-                                length:(NSUInteger) length
-{
-   return( [self initWithFileCData:mulle_data_make( bytes, length) 
-                         allocator:NULL]);
-}                                
 
 
 - (instancetype) initWithFileCData:(struct mulle_data) data
                      sharingObject:(id) sharingObject
 {
-   _fileDataSharingObject = [sharingObject retain];
    return( [self initWithFileCData:data
-                             allocator:NULL]);
-}
-
-
-enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
-{
-   // could be more clever...
-   if( data.length > 4 && ! strncmp( data.bytes, "<svg", 4))
-      return( UIImageDataEncodingSVG);
-
-   return( UIImageDataEncodingUnknown);
+                     sharingObject:sharingObject
+                         allocator:NULL]);
 }
 
 
@@ -53,10 +107,7 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 
 	fp = fopen( filename, "r");
 	if( ! fp)
-   {
-      [self release];
       return( nil);
-   }
 
    fseek( fp, 0, SEEK_END);
    data.length = ftell( fp);
@@ -67,29 +118,21 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
    fclose( fp);
 
    if( actual_length != data.length)
-   {
-      [self release];
       return( nil);
-   }
 
    return( [self initWithFileCData:data
-                             allocator:allocator]);
+                     sharingObject:nil
+                         allocator:allocator]);
 }
 
 
 - (void) dealloc
 {
+   [_fileDataSharingObject release];
    if( _fileDataAllocator)
       mulle_allocator_free( _fileDataAllocator, _fileData.bytes);
-   [_fileDataSharingObject release];
 
    [super dealloc];
-}
-
-
-- (struct mulle_data) cData
-{
-   return( _fileData);
 }
 
 
@@ -101,21 +144,14 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 }
 
 
-// "abstract"
-- (Class) preferredLayerClass
-{
-	return( Nil);
-}
-
 - (int) textureIDWithContext:(CGContext *) context
 {
-   return( context ? [context registerTextureIDForImage:self] : -1);
+   if( ! _image)
+      abort(); // create something with nanovG
+
+   return( [_image textureIDWithContext:context]);
 }
 
-- (int) nvgImageFlags
-{
-   return( 0);
-}
 
 - (UIImage *) imageWithNVGImageFlags:(int) flags
 {
@@ -123,6 +159,7 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
       return( self);
    return( nil);
 }
+
 
 - (enum UIImageDataEncoding) fileEncoding
 {

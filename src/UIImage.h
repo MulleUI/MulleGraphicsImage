@@ -1,10 +1,7 @@
 #import "import.h"
 
-#import "CGGeometry.h"
 
-@class CGContext;
-
-// currently supported types, not very expandable...
+// currently supported types, not very dynamically expandable (yet)...
 enum UIImageDataEncoding
 {
    UIImageDataEncodingUnknown = 0,
@@ -16,17 +13,25 @@ enum UIImageDataEncoding
 };
 
 //
-// An UIImage can retain the file data read or set, so in the event
+// An UIImage is an image loaded from a file or intended to be written into
+// a file. It can retain the file data read or set, so in the event
 // that UIImage returns fileData it will not compress again.
-// If you want to load decoded bitmap data, use MulleBitmapImage
-// directly (see BitmapBytes method)
 //
-@interface UIImage : NSObject
+// If you want to load decoded bitmap data, use MulleBitmapImage
+// directly (see BitmapBytes method) and create an UIImage with it.
+//
+//
+// UIImage is actually a classcluster. You get either a MulleBitmapImage
+// or a MulleSVGImage back (currently)
+//
+@interface UIImage : NSObject < CGImage, MulleObjCClassCluster>
 {
-   id                             _fileDataSharingObject;
-   struct mulle_data              _fileData;
-   struct mulle_allocator        *_fileDataAllocator;
-   enum UIImageDataEncoding       _fileEncoding;
+   id                         _fileDataSharingObject;
+   struct mulle_data          _fileData;
+   struct mulle_allocator     *_fileDataAllocator;
+   enum UIImageDataEncoding   _fileEncoding;
+
+   id <CGImage>               _image;
 }
 
 // if allocator is NULL, data will not be freed
@@ -34,15 +39,13 @@ enum UIImageDataEncoding
 // for malloced data
 - (instancetype) initWithFileCData:(struct mulle_data) data
                          allocator:(struct mulle_allocator *) allocator;
+
 // data belongs to sharingObject, which will be retained
 - (instancetype) initWithFileCData:(struct mulle_data) data
                      sharingObject:(id) sharingObject;
 
-- (instancetype) initWithContentsOfFileWithFileRepresentationString:(char *) filename;
 
-// this is added as a category by the layer to the specific UIImage subclass
-- (Class) preferredLayerClass;
-
+// will return -1, if the image is a vector image
 - (int) textureIDWithContext:(CGContext *) context;
 
 //
@@ -53,33 +56,11 @@ enum UIImageDataEncoding
 // (readonly) and to clone UIImages for different flags. The actual image
 // data can be shared w/o a problem. The default is 0:
 //
-- (int) nvgImageFlags;
-
-//
-// Derive an image, that supports the given NVGflags. If the value can not be
-// supported by the UIImage subclass, this will return nil.
-// May return self!
-//
-- (UIImage *) imageWithNVGImageFlags:(int) flags;
 
 - (enum UIImageDataEncoding) fileEncoding;
-// TODO: rename to fileData or cFileData or so
-- (struct mulle_data) cData;
-
-// bytes won't be copied and freed, will call initWithFileCData:allocator!
-- (instancetype) initWithConstantBytes:(const void *) bytes
-                                length:(NSUInteger) length;
-
 
 @end
 
-
-@interface UIImage( UIImageSubclass)
-
-- (CGSize) size;
-- (CGRect) visibleBounds;
-
-@end
 
 
 enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data);

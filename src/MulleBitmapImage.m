@@ -1,239 +1,102 @@
-#import "import-private.h"
-
+//
+//  MulleBitmapImage.m
+//  MulleUIImage
+//
+//  Copyright (c) 2021 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2021 Codeon GmbH.
+//  All rights reserved.
+//
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//
+//  Redistributions of source code must retain the above copyright notice, this
+//  list of conditions and the following disclaimer.
+//
+//  Redistributions in binary form must reproduce the above copyright notice,
+//  this list of conditions and the following disclaimer in the documentation
+//  and/or other materials provided with the distribution.
+//
+//  Neither the name of Mulle kybernetiK nor the names of its contributors
+//  may be used to endorse or promote products derived from this software
+//  without specific prior written permission.
+//
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+//  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+//  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+//  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+//  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+//  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+//  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+//  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+//  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+//  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+//  POSSIBILITY OF SUCH DAMAGE.
+//
 #import "MulleBitmapImage.h"
 
-#include "stb_image.h"
-#include "bmp-writer.h"
+#import "import-private.h"
+
+// the MulleCG include is handcrafted and doesn't want to expose stb
+// by default, so we grab it directly
+#include <MulleCG/stb_image.h>
 
 
 @implementation MulleBitmapImage
 
-struct mulle_allocator    stbi_allocator;  // no contents
 
-+ (void) initialize
+static const struct mulle_allocator    stbi_allocator;
+
+
++ (void) load
 {
-	stbi_set_unpremultiply_on_load(1);
-	stbi_convert_iphone_png_to_rgb(1);
+   stbi_set_unpremultiply_on_load(1);
+   stbi_convert_iphone_png_to_rgb(1);
+}
+
++ (void) unload
+{
 }
 
 
 
-//
-// here bytes is a loaded stbi_image already (?)
-// so we don't have any fileData!
-//
-- (instancetype) initWithConstRGBA:(const void *) bytes
-                        bitmapSize:(struct mulle_bitmap_size) bitmapSize
++ (instancetype) newWithFileCData:(struct mulle_data) data
+                    sharingObject:(id) sharingObject
+                        allocator:(struct mulle_allocator *) allocator
 {
-   _image = (void *) bytes;
-	if( ! _image)
-   {
-      [self release];
+   int                w;
+   int                h;
+   int                n;
+   void               *bytes;
+   MulleBitmapImage   *obj;
+
+   bytes = stbi_load_from_memory( data.bytes, (int) data.length, &w, &h, &n, 4);
+   if( ! bytes || ! w || ! h || ! n)
       return( nil);
-   }
 
-   _dontFreeImage = YES;
-   _bitmapSize    = bitmapSize;
+   obj = [self new];
 
-	return( self);
-}
+   obj->_fileDataSharingObject = [sharingObject retain];
+   obj->_fileData              = data;
+   obj->_fileDataAllocator     = allocator;
+   obj->_fileEncoding          = UIImageDataEncodingFromCData( data);
 
+   obj->_bitmapInfo.size.width       = w;
+   obj->_bitmapInfo.size.height      = h;
+   obj->_bitmapInfo.nColorComponents = n;
 
-// here bytes is a loaded stbi_image already (?)
-- (instancetype) initWithConstRGBA:(const void *) bytes
-                        bitmapSize:(mulle_bitmap_size) bitmapSize
-                     nvgImageFlags:(int) flags
-{
-   self = [self initWithConstRGBA:bytes
-                       bitmapSize:bitmapSize];
-   if( self)
-      _nvgImageFlags = flags;
-   return( self);
-}
+   obj->_decodedCData = mulle_data_make( bytes, data.length);
+   obj->_allocator    = (void *) &stbi_allocator;
 
-
-- (instancetype) initWithRGBACData:(struct mulle_data) data
-                        bitmapSize:(mulle_bitmap_size) bitmapSize
-                         allocator:(struct mulle_allocator *) allocator
-                     nvgImageFlags:(int) flags
-{
-   self = [self initWithConstRGBA:(const void *) data.bytes
-                       bitmapSize:bitmapSize
-                    nvgImageFlags:flags];
-   if( self)
-   {
-      _fileData           = data;
-      _fileDataAllocator  = allocator;
-      _fileEncoding       = UIImageDataEncodingRGBA;
-   }
-
-   return( self);
-}
-
-
-enum UIImageDataEncoding   MulleBitmapImageDataEncodingFromCData(struct mulle_data data)
-{
-   // can't do this, because stbi__context is unavailable as are the
-   // various test methods
-
-   // https://en.wikipedia.org/wiki/Portable_Network_Graphics
-   static uint8_t   png_header[] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0xA };
-   uint8_t          *start;
-   uint8_t          *end;
-
-   if( data.length > sizeof( png_header) &&
-      ! memcmp( data.bytes, png_header, sizeof( png_header)))
-   {
-      return( UIImageDataEncodingPNG);
-   }
-
-   // https://stackoverflow.com/questions/4550296/how-to-identify-contents-of-a-byte-is-a-jpeg
-   if( data.length > 4)
-   {
-      start = data.bytes;
-      end   = &start[ data.length];
-      if( start[ 0] == 0xFF && start[ 1] == 0xD8 &&
-          end[ -2] == 0xFF && end[ -1] == 0xD9)
-      {
-         return( UIImageDataEncodingJPG);
-      }
-
-      if( start[ 0] == 'B' && start[ 1] == 'M')
-         return( UIImageDataEncodingBMP);
-   }
-
-   return( UIImageDataEncodingUnknown);
-}
-
-
-- (instancetype) initWithFileCData:(struct mulle_data) data
-                             allocator:(struct mulle_allocator *) allocator
-{
-   int   w;
-   int   h;
-   int   n;
-
-	_image = stbi_load_from_memory( data.bytes, (int) data.length, &w, &h, &n, 4);
-	if( ! _image || ! w || ! h || ! n)
-   {
-      [self release];
-      return( nil);
-   }
-
-   self = [super initWithFileCData:data
-                             allocator:allocator];
-
-   _bitmapSize.size.width      = w;
-   _bitmapSize.size.height     = h;
-   _bitmapSize.colorComponents = n;
-
-   _fileEncoding = MulleBitmapImageDataEncodingFromCData( data);
-
-	return( self);
-}
-
-- (instancetype) initWithFileCData:(struct mulle_data) data
-                             allocator:(struct mulle_allocator *) allocator
-                         nvgImageFlags:(int) flags
-{
-   self = [self initWithFileCData:data
-                            allocator:allocator];
-   if( self)
-      _nvgImageFlags = flags;
-   return( self);
-}
-
-
-- (instancetype) initWithContentsOfFileWithFileRepresentationString:(char *) filename
-                                                      nvgImageFlags:(int) flags
-{
-   self = [self initWithContentsOfFileWithFileRepresentationString:filename];
-   if( self)
-      _nvgImageFlags = flags;
-
-	return( self);
+   return( obj);
 }
 
 
 - (void) dealloc
 {
-   if( ! _dontFreeImage)
-      stbi_image_free( _image);
-   [_imageSharingObject release];
-
+   if( _allocator == &stbi_allocator)
+      stbi_image_free( _decodedCData.bytes);
    [super dealloc];
-}
-
-
-- (void *) bytes
-{
-   return( _image);
-}
-
-
-- (CGSize) size
-{
-   return( CGSizeMake( _bitmapSize.size.width, _bitmapSize.size.height));
-}
-
-
-- (CGRect) visibleBounds
-{
-   return( CGRectMake( 0.0, 0.0, _bitmapSize.size.width, _bitmapSize.size.height));
-}
-
-
-- (struct mulle_data) mulleBitmapData
-{
-   return( mulle_data_make( _image,
-                            (NSUInteger) _bitmapSize.size.width * _bitmapSize.size.height * _bitmapSize.colorComponents));
-
-}
-
-
-- (mulle_int_size) intSize
-{
-   return( _bitmapSize.size);
-}
-
-
-- (BOOL) writeToBMPFileWithSystemRepresentation:(char *) filename
-{
-   mulle_int_size   size;
-
-   if( ! filename || ! *filename)
-      return( NO);
-
-   size = _bitmapSize.size;
-   return( ! bmp_rgb32_write_file( filename, _image, size.width, size.height, 0) ? YES : NO);
-}
-
-
-// TODO: war früher echte copy, aber das geht nicht, wegen double-free
-//       und wozu ? Ist eh R/O
-- (id) copy
-{
-   return( [self retain]);
-}
-
-
-// derive an image with different flags for NVG
-- (UIImage *) imageWithNVGImageFlags:(int) flags
-{
-   MulleBitmapImage   *copy;
-
-   if( flags == _nvgImageFlags)
-      return( self);
-
-   copy = NSCopyObject( self, 0, NULL);
-
-   copy->_nvgImageFlags      = flags;
-   copy->_imageSharingObject = [self retain];
-   copy->_dontFreeImage      = YES;
-   copy->_fileDataAllocator  = NULL;
-   [copy->_fileDataSharingObject retain];
-
-   return( [copy autorelease]);
 }
 
 @end
