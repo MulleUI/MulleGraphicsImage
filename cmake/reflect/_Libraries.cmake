@@ -37,6 +37,7 @@ if( NOT Z_LIBRARY)
       )
       # intentionally left blank
    else()
+      # Disable with: `mulle-sourcetree mark z no-require-link`
       message( FATAL_ERROR "Z_LIBRARY was not found")
    endif()
 endif()
@@ -66,6 +67,7 @@ if( NOT BZ2_LIBRARY)
       )
       # intentionally left blank
    else()
+      # Disable with: `mulle-sourcetree mark bz2 no-require-link`
       message( FATAL_ERROR "BZ2_LIBRARY was not found")
    endif()
 endif()
@@ -95,6 +97,7 @@ if( NOT PNG_LIBRARY)
       )
       # intentionally left blank
    else()
+      # Disable with: `mulle-sourcetree mark png no-require-link`
       message( FATAL_ERROR "PNG_LIBRARY was not found")
    endif()
 endif()

@@ -8,16 +8,22 @@ if( MULLE_TRACE_INCLUDE)
    MESSAGE( STATUS "# Include \"${CMAKE_CURRENT_LIST_FILE}\"" )
 endif()
 
+#
+# contents selected with patternfile ??-source--sources
+#
 set( SOURCES
-src/CGLayer+MulleBitmapImage.m
-src/MulleBitmapImage+BMPWriter.m
-src/MulleBitmapImage+PNGWriter.m
-src/MulleBitmapImage.m
-src/MulleSVGImage.m
+src/CGLayer+UIBitmapImage.m
+src/UIBitmapImage+BMPWriter.m
+src/UIBitmapImage+PNGWriter.m
+src/UIBitmapImage.m
 src/UIImage.m
+src/UISVGImage.m
 src/bmp-writer.c
 )
 
+#
+# contents selected with patternfile ??-source--stage2-sources
+#
 set( STAGE2_SOURCES
 src/MulleObjCLoader+MulleUIImage.m
 )

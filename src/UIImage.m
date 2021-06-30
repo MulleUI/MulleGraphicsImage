@@ -1,11 +1,12 @@
 #import "UIImage.h"
 
-#import "MulleSVGImage.h"
-#import "MulleBitmapImage.h"
+#import "UISVGImage.h"
+#import "UIBitmapImage.h"
 
 #import "import-private.h"
 
 #include <unistd.h>  // for ssize_t
+
 
 enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 {
@@ -48,13 +49,13 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 
 
 
-@implementation UIImage( MulleImageLayer)
+@implementation UIImage( CGImageLayer)
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
 - (Class) preferredLayerClass
 {
-	return( [MulleImageLayer class]);
+	return( [CAImageLayer class]);
 }
 
 @end
@@ -72,10 +73,10 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 
    encoding  = UIImageDataEncodingFromCData( data);
    if( encoding == UIImageDataEncodingSVG)
-      return( [MulleSVGImage newWithFileCData:data
+      return( [UISVGImage newWithFileCData:data
                                 sharingObject:sharingObject
                                      allocator:allocator]);
-   return( [MulleBitmapImage newWithFileCData:data
+   return( [UIBitmapImage newWithFileCData:data
                                 sharingObject:sharingObject
                                     allocator:allocator]);
 }
@@ -98,7 +99,13 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 }
 
 
-- (instancetype) initWithContentsOfFileWithFileRepresentationString:(char *) filename
++ (instancetype) imageWithContentsOfFileCString:(char *) s
+{
+   return( [[[self alloc] initWithContentsOfFileCString:s] autorelease]);
+}
+
+
+- (instancetype) initWithContentsOfFileCString:(char *) filename
 {
    FILE                     *fp;
 	ssize_t                  actual_length;
@@ -107,18 +114,24 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 
 	fp = fopen( filename, "r");
 	if( ! fp)
+   {
+//      [self release];  // classcluster, not needed
       return( nil);
+   }
 
    fseek( fp, 0, SEEK_END);
-   data.length = ftell( fp);
+   data.length   = ftell( fp);
    fseek( fp, 0, SEEK_SET);
-   allocator  = MulleObjCInstanceGetAllocator( self);
-   data.bytes = mulle_allocator_malloc( allocator, data.length);
+   allocator     = MulleObjCInstanceGetAllocator( self);
+   data.bytes    = mulle_allocator_malloc( allocator, data.length);
 	actual_length = fread( data.bytes, 1, data.length, fp);
    fclose( fp);
 
    if( actual_length != data.length)
+   {
+//      [self release];  // classcluster, not needed
       return( nil);
+   }
 
    return( [self initWithFileCData:data
                      sharingObject:nil
@@ -141,23 +154,6 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
    if( _fileDataAllocator)
       mulle_allocator_free( _fileDataAllocator, _fileData.bytes);
    _fileData = mulle_data_make( 0, 0);
-}
-
-
-- (int) textureIDWithContext:(CGContext *) context
-{
-   if( ! _image)
-      abort(); // create something with nanovG
-
-   return( [_image textureIDWithContext:context]);
-}
-
-
-- (UIImage *) imageWithNVGImageFlags:(int) flags
-{
-   if( flags == [self nvgImageFlags])
-      return( self);
-   return( nil);
 }
 
 

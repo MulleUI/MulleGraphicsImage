@@ -1,8 +1,10 @@
+      { @selector( MulleObjCLoader), @selector( MulleCA) },      // 47a9beb6;MulleObjCLoader;3422b8ab;MulleCA
+      { @selector( MulleObjCLoader), @selector( MulleCG) },      // 47a9beb6;MulleObjCLoader;d422218a;MulleCG
       { @selector( MulleObjCLoader), @selector( MulleGraphics) },      // 47a9beb6;MulleObjCLoader;d36c3031;MulleGraphics
-      { @selector( CGLayer), @selector( MulleBitmapImage) },      // abf82602;CGLayer;8532dc21;MulleBitmapImage
-      { @selector( MulleBitmapImage), @selector( BMPWriter) },      // 8532dc21;MulleBitmapImage;dca12efd;BMPWriter
-      { @selector( MulleBitmapImage), @selector( PNGWriter) },      // 8532dc21;MulleBitmapImage;c9a1cbbc;PNGWriter
-      { @selector( MulleBitmapImage), MULLE_OBJC_NO_CATEGORYID },      // 8532dc21;MulleBitmapImage;;
-      { @selector( MulleSVGImage), MULLE_OBJC_NO_CATEGORYID },      // 6e79171f;MulleSVGImage;;
-      { @selector( UIImage), @selector( MulleImageLayer) },      // e1a7d20d;UIImage;80047541;MulleImageLayer
+      { @selector( CGLayer), @selector( UIBitmapImage) },      // abf82602;CGLayer;839d5bd4;UIBitmapImage
+      { @selector( UIBitmapImage), @selector( BMPWriter) },      // 839d5bd4;UIBitmapImage;dca12efd;BMPWriter
+      { @selector( UIBitmapImage), @selector( PNGWriter) },      // 839d5bd4;UIBitmapImage;c9a1cbbc;PNGWriter
+      { @selector( UIBitmapImage), MULLE_OBJC_NO_CATEGORYID },      // 839d5bd4;UIBitmapImage;;
+      { @selector( UIImage), @selector( CGImageLayer) },      // e1a7d20d;UIImage;e40db419;CGImageLayer
       { @selector( UIImage), MULLE_OBJC_NO_CATEGORYID },      // e1a7d20d;UIImage;;
+      { @selector( UISVGImage), MULLE_OBJC_NO_CATEGORYID },      // 29fddec6;UISVGImage;;

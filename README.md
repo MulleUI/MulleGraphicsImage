@@ -1,6 +1,6 @@
-# 👓 MulleUIImage
+# 📸 MulleUIImage
 
-#### 👓 MulleUIImage defines UIImage and provides some image file formats
+#### 📸 MulleUIImage defines UIImage and provides some image file formats
 
 
 ### You are here

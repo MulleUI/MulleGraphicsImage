@@ -8,21 +8,33 @@ if( MULLE_TRACE_INCLUDE)
    MESSAGE( STATUS "# Include \"${CMAKE_CURRENT_LIST_FILE}\"" )
 endif()
 
+#
+# contents are derived from the file locations
+
 set( INCLUDE_DIRS
 nanosvg/src
 src
 src/reflect
 )
 
+#
+# contents selected with patternfile ??-header--private-generated-headers
+#
 set( PRIVATE_GENERATED_HEADERS
 src/reflect/_MulleUIImage-import-private.h
 src/reflect/_MulleUIImage-include-private.h
 )
 
+#
+# contents selected with patternfile ??-header--private-generic-headers
+#
 set( PRIVATE_GENERIC_HEADERS
 src/import-private.h
 )
 
+#
+# contents selected with patternfile ??-header--public-generated-headers
+#
 set( PUBLIC_GENERATED_HEADERS
 src/reflect/_MulleUIImage-export.h
 src/reflect/_MulleUIImage-import.h
@@ -30,21 +42,27 @@ src/reflect/_MulleUIImage-include.h
 src/reflect/_MulleUIImage-provide.h
 )
 
+#
+# contents selected with patternfile ??-header--public-generic-headers
+#
 set( PUBLIC_GENERIC_HEADERS
 src/import.h
 )
 
+#
+# contents selected with patternfile ??-header--public-headers
+#
 set( PUBLIC_HEADERS
 nanosvg/src/nanosvg.h
 nanosvg/src/nanosvgrast.h
-src/CGLayer+MulleBitmapImage.h
-src/MulleBitmapImage+BMPWriter.h
-src/MulleBitmapImage+PNGWriter.h
-src/MulleBitmapImage.h
+src/CGLayer+UIBitmapImage.h
 src/MulleObjCLoader+MulleUIImage.h
-src/MulleSVGImage.h
 src/MulleUIImage.h
+src/UIBitmapImage+BMPWriter.h
+src/UIBitmapImage+PNGWriter.h
+src/UIBitmapImage.h
 src/UIImage.h
+src/UISVGImage.h
 src/bmp-writer.h
 src/stb_image_write.h
 )
