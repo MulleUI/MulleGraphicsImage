@@ -37,25 +37,29 @@ static unsigned char  *compress_for_stbiw( unsigned char *data,
 
 @implementation UIBitmapImage ( PNGWriter)
 
-
 - (BOOL) writeToPNGFileWithSystemRepresentation:(char *) filename
 {
    int                      rval;
    struct CGBitmapInfo   bitmapInfo;
    void                     *bytes;
 
-   bitmapInfo = [self bitmapInfo];
-   bytes      = [self decodedCData].bytes;
+   if( [self isFlipped])
+      return( [[self flippedImage] writeToPNGFileWithSystemRepresentation:filename]);
+
+   bytes = [self decodedCData].bytes;
    if( ! bytes)
       return( NO);
 
-   assert( bitmapInfo.encoding = CGBitmapEncodingRGBABytes);
+   bitmapInfo = [self bitmapInfo];
+   if( bitmapInfo.encoding != CGBitmapEncodingRGBABytes)
+      return( NO);
+
    rval = stbi_write_png( filename,
                           bitmapInfo.size.width,
                           bitmapInfo.size.height,
                           4,
                           bytes,
-                          bitmapInfo.size.width * bitmapInfo.nColorComponents);
+                          bitmapInfo.size.width * 4);
    return( rval != 0);
 }
 
@@ -68,19 +72,19 @@ static void   append_data(void *context, void *data, int size)
 
 - (struct mulle_data) PNGCData
 {
-   int                        rval;
-   NSUInteger                 lineLength;
-   struct mulle_buffer        buffer;
-   struct CGBitmapInfo     bitmapInfo;
-   void                       *bytes;
-   struct mulle_data          data;
+   int                   rval;
+   NSUInteger            lineLength;
+   struct mulle_buffer   buffer;
+   struct CGBitmapInfo   bitmapInfo;
+   void                  *bytes;
+   struct mulle_data     data;
 
    bitmapInfo = [self bitmapInfo];
    bytes      = [self decodedCData].bytes;
    if( ! bytes)
       return( mulle_data_make_invalid());
 
-   lineLength = bitmapInfo.size.width * bitmapInfo.nColorComponents;
+   lineLength = CGBitmapInfoGetLineLength( bitmapInfo);
 
    mulle_buffer_init_with_capacity( &buffer,
                                     1024 + bitmapInfo.size.width * lineLength,

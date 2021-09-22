@@ -18,7 +18,6 @@
       return( nil);
 
    bitmapInfo.size             = [self bitmapInfo].size;
-   bitmapInfo.nColorComponents = 4;
    bitmapInfo.encoding         = CGBitmapEncodingRGBABytes;
 
    image = [[[UIBitmapImage alloc] initWithCData:data

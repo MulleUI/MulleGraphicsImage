@@ -79,18 +79,30 @@
 // UIBitmapImage can be used by multiple contexts, it will create
 // a CGTextureImage on demand.
 //
+#define UIBitmapImageNumberOfContextMappings  4
+
 @interface UIBitmapImage : UIImage <CGBitmapDrawable, CGContextResource>
 {
    struct mulle_allocator     *_allocator;
 
    //
-   // currently there are 32 image flags, instead of using another
-   // indirection map, we use 32 pointermaps, they will be mostly just empty
+   // currently there are 64 imageflag combination, each will yield a 
+   // different CGImage. Each CGImage is only valid in its own CGContext.
+   // 
+   // We assume combinations are pretty much the same always, so we only
+   // cache a few different imageFlags combination for each context.
    //
-   struct mulle__pointermap   _context_map[ 0x40];
+   int                        _n_imageFlag_index;
+   int                        _imageFlag_index[ UIBitmapImageNumberOfContextMappings];
+   struct mulle__pointermap   _context_map[ UIBitmapImageNumberOfContextMappings];
 }
+
 @property( readonly) struct CGBitmapInfo   bitmapInfo;
 @property( readonly) struct mulle_data     decodedCData;
+
+// vertically flipped that is
+- (UIBitmapImage *) flippedImage;
+- (BOOL) isFlipped;
 
 - (instancetype) initWithCData:(struct mulle_data) data
                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo

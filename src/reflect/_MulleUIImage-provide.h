@@ -11,5 +11,4 @@
  */
 #include "nanosvg.h"
 #include "nanosvgrast.h"
-#include "bmp-writer.h"
 #include "stb_image_write.h"

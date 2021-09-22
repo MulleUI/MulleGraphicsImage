@@ -31,6 +31,16 @@
 
 ```
 
+
+## Dependencies 
+
+### Debian
+
+```
+apt-get install libbz2-dev
+```
+
+
 ## Add
 
 Use [mulle-sde](//github.com/mulle-sde) to add MulleUIImage to your project:

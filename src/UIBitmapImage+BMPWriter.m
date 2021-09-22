@@ -37,14 +37,15 @@
 
 #import "import-private.h"
 
-#import "bmp-writer.h"
-
 
 @implementation UIBitmapImage ( BMPWriter)
 
 - (BOOL) writeToBMPFileWithSystemRepresentation:(char *) filename
 {
    void   *bytes;
+
+   if( [self isFlipped])
+      return( [[self flippedImage] writeToBMPFileWithSystemRepresentation:filename]);
 
    if( ! filename || ! *filename)
       return( NO);

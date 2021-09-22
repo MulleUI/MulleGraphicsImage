@@ -76,7 +76,6 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
-
 + (instancetype) newWithFileCData:(struct mulle_data) data
                     sharingObject:(id) sharingObject
                         allocator:(struct mulle_allocator *) allocator
@@ -93,14 +92,14 @@ static const struct mulle_allocator    stbi_allocator;
 
    obj = [self new];
 
-   obj->_fileDataSharingObject       = [sharingObject retain];
-   obj->_fileData                    = data;
-   obj->_fileDataAllocator           = allocator;
-   obj->_fileEncoding                = UIImageDataEncodingFromCData( data);
+   obj->_fileDataSharingObject  = [sharingObject retain];
+   obj->_fileData               = data;
+   obj->_fileDataAllocator      = allocator;
+   obj->_fileEncoding           = UIImageDataEncodingFromCData( data);
 
-   obj->_bitmapInfo.size.width       = w;
-   obj->_bitmapInfo.size.height      = h;
-   obj->_bitmapInfo.nColorComponents = n;
+   obj->_bitmapInfo.size.width  = w;
+   obj->_bitmapInfo.size.height = h;
+   obj->_bitmapInfo.encoding    = CGBitmapEncodingRGBABytes;
 
    obj->_decodedCData = mulle_data_make( bytes,
                                          CGBitmapInfoGetSizeInBytes( obj->_bitmapInfo));
@@ -108,7 +107,6 @@ static const struct mulle_allocator    stbi_allocator;
 
    return( obj);
 }
-
 
 
 - (void) releaseAllImages
@@ -119,7 +117,7 @@ static const struct mulle_allocator    stbi_allocator;
    CGContext                            *context;
    unsigned int                         i;
 
-   for( i = 0; i < 0x40; i++)
+   for( i = 0; i < _n_imageFlag_index; i++)
    {
       tmp = _context_map[ i];
       _mulle__pointermap_init( &_context_map[ i], 0, MulleObjCInstanceGetAllocator( self));
@@ -135,6 +133,9 @@ static const struct mulle_allocator    stbi_allocator;
 
       _mulle__pointermap_done( &tmp, MulleObjCInstanceGetAllocator( self));
    }
+
+   memset( &_context_map[ 0], 0, sizeof( _context_map));
+   _n_imageFlag_index = 0;
 }
 
 
@@ -161,6 +162,62 @@ static const struct mulle_allocator    stbi_allocator;
    return( _decodedCData.bytes);
 }
 
+- (NSUInteger) length
+{
+   return( _decodedCData.length);
+}
+
+
+- (BOOL) isFlipped
+{
+   return( CGBitmapEncodingIsFlipped( _bitmapInfo.encoding));
+}
+
+
+- (UIBitmapImage *) flippedImage
+{
+   UIBitmapImage            *flipped;
+   struct mulle_allocator   *allocator;
+   struct CGBitmapInfo      bitmapInfo;
+   struct mulle_data        src_data;
+   struct mulle_data        data;
+   NSInteger                line_length;
+   uint8_t                  *src;
+   uint8_t                  *dst;
+   uint8_t                  *sentinel;
+
+   // don't use _allocator, could be the stbi one
+   bitmapInfo  = [self bitmapInfo];
+   bitmapInfo.encoding = CGBitmapEncodingByFlipping( bitmapInfo.encoding);
+
+   src_data    = [self decodedCData];
+   line_length = CGBitmapInfoGetLineLength( bitmapInfo);
+
+   allocator   = MulleObjCInstanceGetAllocator( self);
+   data.length = src_data.length;
+   data.bytes  = mulle_allocator_malloc( allocator, data.length);
+   dst         = data.bytes;
+   sentinel    = &dst[ data.length - line_length];
+
+   src         = src_data.bytes;
+   src         = &src[ line_length * bitmapInfo.size.height];
+
+   while( dst <= sentinel)
+   {
+      src = &src[ -line_length];
+
+      memcpy( dst, src, line_length);
+
+      dst = &dst[ line_length];
+   }
+
+   flipped   = [[[UIBitmapImage alloc] initWithCData:data
+                                          bitmapInfo:bitmapInfo
+                                           allocator:allocator] autorelease];
+   return( flipped);
+}
+
+
 
 - (int) textureIDWithContext:(CGContext *) context
                   imageFlags:(NSUInteger) imageFlags
@@ -169,29 +226,67 @@ static const struct mulle_allocator    stbi_allocator;
    int                   textureID;
    CGImage               *image;
    void                  *bytes;
-   unsigned int          i;
+   int                   i;
+   int                   j;
 
-   i     = imageFlags & 0x3F;
-   image = mulle__pointermap_get( &_context_map[ i], context);
+   bitmapInfo = [self bitmapInfo];
+
+   //
+   // if imageFlags comes in asking for flipped and internal representation
+   // is flipped already, then clear, otherwise set for "normal" display
+   if( CGBitmapEncodingIsFlipped( _bitmapInfo.encoding))
+      imageFlags ^= NVG_IMAGE_FLIPY;
+
+   // map imageFlags hopefully to a cachable index
+   // we only care for lower 6 bits
+   // also get cached image if present
+   i     = -1;
+   image = NULL;
+   for( j = 0; j <_n_imageFlag_index; j++)
+      if( _imageFlag_index[ j] == (imageFlags & 0x3F))
+      {
+         i     = _imageFlag_index[ j];
+         image = mulle__pointermap_get( &_context_map[ i], context);
+         break;
+      }
+   
+   // create a new cacheable index if possible
+   if( i == -1 && _n_imageFlag_index < UIBitmapImageNumberOfContextMappings)
+   {
+      i                    = _n_imageFlag_index;
+      _imageFlag_index[ i] = (imageFlags & 0x3F);
+      _n_imageFlag_index++;
+   }
+
    if( ! image)
    {
-      bytes      = [self bytes];
-      bitmapInfo = [self bitmapInfo];
-      image      = [[CGImage alloc] initWithRGBABytes:bytes
-                                           bitmapSize:bitmapInfo.size
-                                           imageFlags:imageFlags
-                                              context:context];
+      bytes = [self bytes];
+      switch( bitmapInfo.encoding)
+      {
+      case CGBitmapEncodingRGBABytes :
+      case CGBitmapEncodingFlipYRGBABytes :
+         image = [[CGImage alloc] initWithRGBABytes:bytes
+                                         bitmapSize:bitmapInfo.size
+                                         imageFlags:imageFlags
+                                            context:context];
+      default :
+         break;
+      }
+
       if( ! image)
          return( -1);
 
-      mulle__pointermap_set( &_context_map[ i],
-                             context,
-                             image,
-                             MulleObjCInstanceGetAllocator( self));
+      if( i != -1)
+      {
+         mulle__pointermap_set( &_context_map[ i],
+                                context,
+                                image,
+                                MulleObjCInstanceGetAllocator( self));
 
-      // we add ourselves to the resources to remove
-      // that way we can remove the image from the context map
-      [context addToResources:self];
+         // we add ourselves to the resources to remove
+         // that way we can remove the image from the context map
+         [context addToResources:self];
+      }
    }
    return( [image textureIDWithContext:context
                            imageFlags:imageFlags]);
@@ -203,7 +298,7 @@ static const struct mulle_allocator    stbi_allocator;
    CGImage        *image;
    unsigned int   i;
 
-   for( i = 0; i < 0x40; i++)
+   for( i = 0; i < _n_imageFlag_index; i++)
    {
       image = _mulle__pointermap_get( &_context_map[ i], context);
       if( image)
