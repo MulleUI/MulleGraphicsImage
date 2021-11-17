@@ -60,12 +60,12 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
-- (instancetype) initWithCData:(struct mulle_data) data
+- (instancetype) initWithBytes:(void *) bytes
                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                      allocator:(struct mulle_allocator *) allocator
 {
    _bitmapInfo    = bitmapInfo;
-   _decodedCData  = data;
+   _bytes         = bytes;
    _allocator     = allocator;
 
 // we don't need to do this, as its just a memset 0
@@ -101,9 +101,8 @@ static const struct mulle_allocator    stbi_allocator;
    obj->_bitmapInfo.size.height = h;
    obj->_bitmapInfo.encoding    = CGBitmapEncodingRGBABytes;
 
-   obj->_decodedCData = mulle_data_make( bytes,
-                                         CGBitmapInfoGetSizeInBytes( obj->_bitmapInfo));
-   obj->_allocator    = (void *) &stbi_allocator;
+   obj->_bytes                  = bytes;
+   obj->_allocator              = (void *) &stbi_allocator;
 
    return( obj);
 }
@@ -149,22 +148,22 @@ static const struct mulle_allocator    stbi_allocator;
 - (void) dealloc
 {
    if( _allocator == &stbi_allocator)
-      stbi_image_free( _decodedCData.bytes);
+      stbi_image_free( _bytes);
    else
       if( _allocator)
-         mulle_allocator_free( _allocator, _decodedCData.bytes);
+         mulle_allocator_free( _allocator, _bytes);
    [super dealloc];
 }
 
 
 - (void *) bytes
 {
-   return( _decodedCData.bytes);
+   return( _bytes);
 }
 
 - (NSUInteger) length
 {
-   return( _decodedCData.length);
+   return( CGBitmapInfoGetAllocationSize( _bitmapInfo));
 }
 
 
@@ -190,8 +189,9 @@ static const struct mulle_allocator    stbi_allocator;
    bitmapInfo  = [self bitmapInfo];
    bitmapInfo.encoding = CGBitmapEncodingByFlipping( bitmapInfo.encoding);
 
-   src_data    = [self decodedCData];
-   line_length = CGBitmapInfoGetLineLength( bitmapInfo);
+   src_data.bytes  = [self bytes];
+   src_data.length = CGBitmapInfoGetAllocationSize( bitmapInfo);
+   line_length     = CGBitmapInfoGetLineLength( bitmapInfo);
 
    allocator   = MulleObjCInstanceGetAllocator( self);
    data.length = src_data.length;
@@ -218,12 +218,11 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
-
-- (int) textureIDWithContext:(CGContext *) context
-                  imageFlags:(NSUInteger) imageFlags
+- (CGImage *) cgImageWithContext:(CGContext *) context
+                      imageFlags:(NSUInteger) imageFlags
 {
    struct CGBitmapInfo   bitmapInfo;
-   int                   textureID;
+   NSInteger             imageID;
    CGImage               *image;
    void                  *bytes;
    int                   i;
@@ -249,7 +248,7 @@ static const struct mulle_allocator    stbi_allocator;
          image = mulle__pointermap_get( &_context_map[ i], context);
          break;
       }
-   
+
    // create a new cacheable index if possible
    if( i == -1 && _n_imageFlag_index < UIBitmapImageNumberOfContextMappings)
    {
@@ -274,7 +273,7 @@ static const struct mulle_allocator    stbi_allocator;
       }
 
       if( ! image)
-         return( -1);
+         return( nil);
 
       if( i != -1)
       {
@@ -288,7 +287,21 @@ static const struct mulle_allocator    stbi_allocator;
          [context addToResources:self];
       }
    }
-   return( [image textureIDWithContext:context
+   return( image);
+}
+
+
+- (NSInteger) nvgImageWithContext:(CGContext *) context
+                        imageFlags:(NSUInteger) imageFlags
+{
+   CGImage   *image;
+
+   image = [self cgImageWithContext:context
+                         imageFlags:imageFlags];
+   if( ! image)
+      return( -1);
+
+   return( [image nvgImageWithContext:context
                            imageFlags:imageFlags]);
 }
 

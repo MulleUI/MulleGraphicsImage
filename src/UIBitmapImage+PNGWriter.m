@@ -46,7 +46,7 @@ static unsigned char  *compress_for_stbiw( unsigned char *data,
    if( [self isFlipped])
       return( [[self flippedImage] writeToPNGFileWithSystemRepresentation:filename]);
 
-   bytes = [self decodedCData].bytes;
+   bytes = [self bytes];
    if( ! bytes)
       return( NO);
 
@@ -80,7 +80,7 @@ static void   append_data(void *context, void *data, int size)
    struct mulle_data     data;
 
    bitmapInfo = [self bitmapInfo];
-   bytes      = [self decodedCData].bytes;
+   bytes      = [self bytes];
    if( ! bytes)
       return( mulle_data_make_invalid());
 

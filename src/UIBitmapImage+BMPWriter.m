@@ -50,7 +50,7 @@
    if( ! filename || ! *filename)
       return( NO);
 
-   bytes = [self decodedCData].bytes;
+   bytes = [self bytes];
    if( ! bytes)
       return( NO);
    return( bmp_rgb32_write_file( filename,

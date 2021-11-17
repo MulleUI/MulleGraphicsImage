@@ -33,6 +33,11 @@ enum UIImageDataEncoding
 }
 
 + (instancetype) imageWithContentsOfFileCString:(char *) s;
++ (instancetype) imageWithFileCData:(struct mulle_data) data
+                         allocator:(struct mulle_allocator *) allocator;
++ (instancetype) imageWithFileCData:(struct mulle_data) data
+                     sharingObject:(id) sharingObject;
+                     
 - (instancetype) initWithContentsOfFileCString:(char *) s;
 
 // if allocator is NULL, data will not be freed
@@ -48,9 +53,9 @@ enum UIImageDataEncoding
 
 //
 // Textures (images) in NVG can be created with different flags, for example
-// REPEAT_X andREPEAT_Y. When we are asking the CGContext for a textureID
+// REPEAT_X andREPEAT_Y. When we are asking the CGContext for a imageID
 // for an image this will create such a NVG texture. As the context cashes the
-// textureID for each UIImage it's simplest to store the imageFlags here
+// imageID for each UIImage it's simplest to store the imageFlags here
 // (readonly) and to clone UIImages for different flags. The actual image
 // data can be shared w/o a problem. The default is 0:
 //

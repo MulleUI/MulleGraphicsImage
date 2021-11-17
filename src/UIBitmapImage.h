@@ -86,9 +86,9 @@
    struct mulle_allocator     *_allocator;
 
    //
-   // currently there are 64 imageflag combination, each will yield a 
+   // currently there are 64 imageflag combination, each will yield a
    // different CGImage. Each CGImage is only valid in its own CGContext.
-   // 
+   //
    // We assume combinations are pretty much the same always, so we only
    // cache a few different imageFlags combination for each context.
    //
@@ -98,13 +98,13 @@
 }
 
 @property( readonly) struct CGBitmapInfo   bitmapInfo;
-@property( readonly) struct mulle_data     decodedCData;
+@property( readonly) void                 *bytes;
 
 // vertically flipped that is
 - (UIBitmapImage *) flippedImage;
 - (BOOL) isFlipped;
 
-- (instancetype) initWithCData:(struct mulle_data) data
+- (instancetype) initWithBytes:(void *) bytes
                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                      allocator:(struct mulle_allocator *) allocator;
 
@@ -112,6 +112,9 @@
                     sharingObject:(id) sharingObject
                         allocator:(struct mulle_allocator *) allocator;
 
-- (int) textureIDWithContext:(CGContext *) context
-                  imageFlags:(NSUInteger) imageFlags;
+- (CGImage *) cgImageWithContext:(CGContext *) context
+                      imageFlags:(NSUInteger) imageFlags;
+
+- (NSInteger) nvgImageWithContext:(CGContext *) context
+                        imageFlags:(NSUInteger) imageFlags;
 @end

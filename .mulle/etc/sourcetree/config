@@ -4,3 +4,4 @@ z;none;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-he
 bz2;none;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;1012BD39-CB3B-4C0E-B5DB-030118C4059E;;${BZ2_BRANCH};;;
 png;none;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;02BCFB45-5ACD-4DBF-B1C3-7BFE405953C4;;${PNG_BRANCH};;;
 src/stb_image_write.h;file;no-all-load,no-build,no-header,no-import,no-link,no-readwrite,no-share,no-singlephase;CFF51FD6-090A-418A-A356-6A7183092CE3;https://raw.githubusercontent.com/nothings/stb/master/stb_image_write.h;;;;
+mulle-objc-list;${MULLE_OBJC_LIST_NODETYPE:-tar};no-all-load,no-bequeath,no-cmake-inherit,no-header,no-link;63EFADB0-FD85-4745-9DA7-6FC752ACF180;${MULLE_OBJC_LIST_URL:-https://github.com/mulle-objc/mulle-objc-list/archive/${MULLE_TAG}.tar.gz};${MULLE_OBJC_LIST_BRANCH};${MULLE_OBJC_LIST_TAG:-latest};;
