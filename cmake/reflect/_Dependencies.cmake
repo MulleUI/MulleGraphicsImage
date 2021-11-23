@@ -14,7 +14,7 @@ endif()
 #
 # Generated from sourcetree: BE03CBCA-C69F-4FCD-AFC5-69A20255D4EE;MulleGraphics;no-singlephase;
 # Disable with : `mulle-sourcetree mark MulleGraphics no-link`
-# Disable for this platform: `mulle-sourcetree mark MulleGraphics no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark MulleGraphics no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_GRAPHICS_LIBRARY)
    find_library( MULLE_GRAPHICS_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_STATIC_LIBRARY_SUFFIX} MulleGraphics NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)

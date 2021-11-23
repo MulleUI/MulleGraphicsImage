@@ -37,7 +37,7 @@ enum UIImageDataEncoding
                          allocator:(struct mulle_allocator *) allocator;
 + (instancetype) imageWithFileCData:(struct mulle_data) data
                      sharingObject:(id) sharingObject;
-                     
+
 - (instancetype) initWithContentsOfFileCString:(char *) s;
 
 // if allocator is NULL, data will not be freed
@@ -64,6 +64,12 @@ enum UIImageDataEncoding
 
 @end
 
+
+@interface UIImage( CGImageLayer)
+
+- (Class) preferredLayerClass;
+
+@end
 
 
 enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data);

@@ -191,7 +191,7 @@ static const struct mulle_allocator    stbi_allocator;
 
    src_data.bytes  = [self bytes];
    src_data.length = CGBitmapInfoGetAllocationSize( bitmapInfo);
-   line_length     = CGBitmapInfoGetLineLength( bitmapInfo);
+   line_length     = CGBitmapInfoGetLineSize( bitmapInfo);
 
    allocator   = MulleObjCInstanceGetAllocator( self);
    data.length = src_data.length;
@@ -211,7 +211,7 @@ static const struct mulle_allocator    stbi_allocator;
       dst = &dst[ line_length];
    }
 
-   flipped   = [[[UIBitmapImage alloc] initWithCData:data
+   flipped   = [[[UIBitmapImage alloc] initWithBytes:data.bytes
                                           bitmapInfo:bitmapInfo
                                            allocator:allocator] autorelease];
    return( flipped);

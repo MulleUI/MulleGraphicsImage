@@ -13,16 +13,16 @@
    UIBitmapImage         *image;
    struct CGBitmapInfo   bitmapInfo;
 
-   data = [self readRGBACData:&mulle_stdlib_allocator];
+   data = [self readRGBACData:&mulle_default_allocator];
    if( ! data.length)
       return( nil);
 
-   bitmapInfo.size             = [self bitmapInfo].size;
-   bitmapInfo.encoding         = CGBitmapEncodingRGBABytes;
+   bitmapInfo          = [self bitmapInfo];
+   bitmapInfo.encoding = CGBitmapEncodingRGBABytes;
 
-   image = [[[UIBitmapImage alloc] initWithCData:data
+   image = [[[UIBitmapImage alloc] initWithBytes:data.bytes
                                       bitmapInfo:bitmapInfo
-                                       allocator:&mulle_stdlib_allocator] autorelease];
+                                       allocator:&mulle_default_allocator] autorelease];
    return( image);
 }
 

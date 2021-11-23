@@ -84,7 +84,7 @@ static void   append_data(void *context, void *data, int size)
    if( ! bytes)
       return( mulle_data_make_invalid());
 
-   lineLength = CGBitmapInfoGetLineLength( bitmapInfo);
+   lineLength = CGBitmapInfoGetLineSize( bitmapInfo);
 
    mulle_buffer_init_with_capacity( &buffer,
                                     1024 + bitmapInfo.size.width * lineLength,

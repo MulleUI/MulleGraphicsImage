@@ -14,7 +14,7 @@ endif()
 #
 # Generated from sourcetree: 88F6D64A-1612-432A-AB72-08E0ED42D9C0;z;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;
 # Disable with : `mulle-sourcetree mark z `
-# Disable for this platform: `mulle-sourcetree mark z no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark z no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT Z_LIBRARY)
    find_library( Z_LIBRARY NAMES z)
@@ -44,7 +44,7 @@ endif()
 #
 # Generated from sourcetree: 1012BD39-CB3B-4C0E-B5DB-030118C4059E;bz2;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;
 # Disable with : `mulle-sourcetree mark bz2 `
-# Disable for this platform: `mulle-sourcetree mark bz2 no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark bz2 no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT BZ2_LIBRARY)
    find_library( BZ2_LIBRARY NAMES bz2)
@@ -74,7 +74,7 @@ endif()
 #
 # Generated from sourcetree: 02BCFB45-5ACD-4DBF-B1C3-7BFE405953C4;png;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;
 # Disable with : `mulle-sourcetree mark png `
-# Disable for this platform: `mulle-sourcetree mark png no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark png no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT PNG_LIBRARY)
    find_library( PNG_LIBRARY NAMES png)
