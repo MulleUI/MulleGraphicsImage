@@ -60,6 +60,16 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
++ (instancetype) imageWithBytes:(void *) bytes
+                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo
+                      allocator:(struct mulle_allocator *) allocator
+{
+   return( [[[self alloc] initWithBytes:bytes
+                             bitmapInfo:bitmapInfo
+                              allocator:allocator] autorelease]);
+}
+
+
 - (instancetype) initWithBytes:(void *) bytes
                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                      allocator:(struct mulle_allocator *) allocator
@@ -156,10 +166,13 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
-- (void *) bytes
+- (void *) RGBABytes
 {
-   return( _bytes);
+   if( _bitmapInfo.encoding == CGBitmapEncodingRGBABytes)
+      return( _bytes);
+   return( NULL);
 }
+
 
 - (NSUInteger) length
 {

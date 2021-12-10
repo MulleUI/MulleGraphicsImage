@@ -50,14 +50,14 @@
    if( ! filename || ! *filename)
       return( NO);
 
-   bytes = [self bytes];
+   bytes = [self RGBABytes];
    if( ! bytes)
       return( NO);
-   return( bmp_rgb32_write_file( filename,
-                                 bytes,
-                                 _bitmapInfo.size.width,
-                                 _bitmapInfo.size.height,
-                                 0) ? NO : YES);
+   return( bmp_rgba32_write_file( filename,
+                                  bytes,
+                                  _bitmapInfo.size.width,
+                                  _bitmapInfo.size.height,
+                                  0) ? NO : YES);
 }
 
 @end

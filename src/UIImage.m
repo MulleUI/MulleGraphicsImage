@@ -83,7 +83,7 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 
 
 + (instancetype) imageWithFileCData:(struct mulle_data) data
-                         allocator:(struct mulle_allocator *) allocator
+                          allocator:(struct mulle_allocator *) allocator
 {
    return( [[[self alloc] initWithFileCData:data 
                                   allocator:allocator] autorelease]);
@@ -91,7 +91,7 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 
 
 + (instancetype) imageWithFileCData:(struct mulle_data) data
-                     sharingObject:(id) sharingObject
+                      sharingObject:(id) sharingObject
 {
    return( [[[self alloc] initWithFileCData:data 
                               sharingObject:sharingObject] autorelease]);

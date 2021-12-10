@@ -9,18 +9,18 @@
 
 - (UIBitmapImage *) bitmapImage
 {
-   struct mulle_data     data;
+   void                  *bytes;
    UIBitmapImage         *image;
    struct CGBitmapInfo   bitmapInfo;
 
-   data = [self readRGBACData:&mulle_default_allocator];
-   if( ! data.length)
+   bytes = [self readRGBABytes:&mulle_default_allocator];
+   if( ! bytes)
       return( nil);
 
    bitmapInfo          = [self bitmapInfo];
    bitmapInfo.encoding = CGBitmapEncodingRGBABytes;
 
-   image = [[[UIBitmapImage alloc] initWithBytes:data.bytes
+   image = [[[UIBitmapImage alloc] initWithBytes:bytes
                                       bitmapInfo:bitmapInfo
                                        allocator:&mulle_default_allocator] autorelease];
    return( image);

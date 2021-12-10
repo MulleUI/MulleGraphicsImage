@@ -104,6 +104,13 @@
 - (UIBitmapImage *) flippedImage;
 - (BOOL) isFlipped;
 
+// will return NULL if bitmap is not in RGBA format
+- (void *) RGBABytes;
+
++ (instancetype) imageWithBytes:(void *) bytes
+                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo
+                      allocator:(struct mulle_allocator *) allocator;
+
 - (instancetype) initWithBytes:(void *) bytes
                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                      allocator:(struct mulle_allocator *) allocator;
