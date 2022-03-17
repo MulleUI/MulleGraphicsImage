@@ -9,7 +9,7 @@
  *
  *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
  */
-#import "CGLayer+UIBitmapImage.h"
+#import "CGImage+UIBitmapImage.h"
 #import "MulleObjCLoader+MulleUIImage.h"
 #import "UIBitmapImage+BMPWriter.h"
 #import "UIBitmapImage+PNGWriter.h"

@@ -83,7 +83,7 @@
 
 @interface UIBitmapImage : UIImage <CGBitmapDrawable, CGContextResource>
 {
-   struct mulle_allocator     *_allocator;
+   struct CGBitmap            _bitmap;
 
    //
    // currently there are 64 imageflag combination, each will yield a
@@ -97,20 +97,24 @@
    struct mulle__pointermap   _context_map[ UIBitmapImageNumberOfContextMappings];
 }
 
-@property( readonly) struct CGBitmapInfo   bitmapInfo;
-@property( readonly) void                 *bytes;
 
-// vertically flipped that is
-- (UIBitmapImage *) flippedImage;
-- (BOOL) isFlipped;
+// The bitmap info will be copied and the data owned (not copied!) by
+// UIBitmapImage.
+// So usually the caller shouldn't touch bitmap afterwards
++ (instancetype) imageWithBitmap:(struct CGBitmap *) bitmap;
 
-// will return NULL if bitmap is not in RGBA format
-- (void *) RGBABytes;
-
+// if allocator is NULL, then no free on release
 + (instancetype) imageWithBytes:(void *) bytes
                      bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                       allocator:(struct mulle_allocator *) allocator;
 
+
+// The bitmap info will be copied and the data owned (not copied!) by
+// UIBitmapImage.
+// So usually the caller shouldn't touch bitmap afterwards
+- (instancetype) initWithBitmap:(struct CGBitmap *) bitmap;
+
+// if allocator is NULL, then no free on release
 - (instancetype) initWithBytes:(void *) bytes
                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                      allocator:(struct mulle_allocator *) allocator;
@@ -123,5 +127,20 @@
                       imageFlags:(NSUInteger) imageFlags;
 
 - (NSInteger) nvgImageWithContext:(CGContext *) context
-                        imageFlags:(NSUInteger) imageFlags;
+                       imageFlags:(NSUInteger) imageFlags;
+
+- (struct CGBitmapInfo) bitmapInfo;
+- (struct mulle_allocator *)  bitmapAllocator;
+- (void *) bytes;
+
+// will return NULL if bitmap is not in RGBA format
+- (void *) RGBABytes;
+
+// vertically flipped that is
+- (UIBitmapImage *) flippedImageWithAllocator:(struct mulle_allocator *) allocator;
+- (UIBitmapImage *) flippedImage;
+
+- (BOOL) isFlipped;
+
+
 @end

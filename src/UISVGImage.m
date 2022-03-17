@@ -169,7 +169,7 @@ static CGDrawableOptions  defaultOptions =
    float               *p;
    NSVGpath            *path;
    NSVGshape           *shape;
-   CGColor          color;
+   CGColor             color;
    CGPoint             scale;
    CGRect              rect;
    int                 i;
@@ -201,11 +201,11 @@ static CGDrawableOptions  defaultOptions =
          nvgStrokeWidth( vg, shape->strokeWidth);
 
          color = getSVGColor( shape->fill.color);
-         CGColorDim( color, options->alpha);
+         color = CGColorByMultiplyingAlpha( color, options->alpha);
          nvgFillColor( vg, color);
 
          color = getSVGColor( shape->stroke.color);
-         CGColorDim( color, options->alpha);
+         color = CGColorByMultiplyingAlpha( color, options->alpha);
          nvgStrokeColor( vg, color);
 
          for( path = shape->paths; path != NULL; path = path->next)

@@ -2,7 +2,7 @@
 
 @class UIBitmapImage;
 
-@interface CGLayer( UIBitmapImage)
+@interface CGImage( UIBitmapImage)
 
 // get a "saveable" bitmap image out of a texture,
 - (UIBitmapImage *) bitmapImage;

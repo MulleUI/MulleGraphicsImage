@@ -60,6 +60,12 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
++ (instancetype) imageWithBitmap:(struct CGBitmap *) bitmap
+{
+   return( [[[self alloc] initWithBitmap:bitmap] autorelease]);
+}
+
+
 + (instancetype) imageWithBytes:(void *) bytes
                      bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                       allocator:(struct mulle_allocator *) allocator
@@ -70,14 +76,34 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
+- (instancetype) initWithBitmap:(struct CGBitmap *) bitmap
+{
+   if( ! bitmap || ! bitmap->bytes)
+   {
+      [self release];
+      return( nil);
+   }
+
+   _bitmap = *bitmap;
+// we don't need to do this, as its just a memset 0
+//   for( i = 0; i < 0x4ß; i++)
+//   _mulle__pointermap_init( &_context_map[ i], 0, MulleObjCInstanceGetAllocator( self));
+
+   return( self);
+}
+
+
 - (instancetype) initWithBytes:(void *) bytes
                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                      allocator:(struct mulle_allocator *) allocator
 {
-   _bitmapInfo    = bitmapInfo;
-   _bytes         = bytes;
-   _allocator     = allocator;
+   if( ! bytes)
+   {
+      [self release];
+      return( nil);
+   }
 
+   CGBitmapInit( &_bitmap, bytes, bitmapInfo, allocator);
 // we don't need to do this, as its just a memset 0
 //   for( i = 0; i < 0x4ß; i++)
 //   _mulle__pointermap_init( &_context_map[ i], 0, MulleObjCInstanceGetAllocator( self));
@@ -107,12 +133,12 @@ static const struct mulle_allocator    stbi_allocator;
    obj->_fileDataAllocator      = allocator;
    obj->_fileEncoding           = UIImageDataEncodingFromCData( data);
 
-   obj->_bitmapInfo.size.width  = w;
-   obj->_bitmapInfo.size.height = h;
-   obj->_bitmapInfo.encoding    = CGBitmapEncodingRGBABytes;
-
-   obj->_bytes                  = bytes;
-   obj->_allocator              = (void *) &stbi_allocator;
+   CGBitmapInit( &obj->_bitmap,
+                 bytes,
+                 CGBitmapInfoMake( CGBitmapSizeMake( w, h),
+                                   0,
+                                   CGBitmapEncodingRGBABytes),
+                 (struct mulle_allocator *) &stbi_allocator);
 
    return( obj);
 }
@@ -157,57 +183,82 @@ static const struct mulle_allocator    stbi_allocator;
 
 - (void) dealloc
 {
-   if( _allocator == &stbi_allocator)
-      stbi_image_free( _bytes);
+   if( _bitmap.allocator == &stbi_allocator)
+      stbi_image_free( _bitmap.bytes);
    else
-      if( _allocator)
-         mulle_allocator_free( _allocator, _bytes);
+      CGBitmapDone( &_bitmap);
+
    [super dealloc];
+}
+
+
+- (struct CGBitmapInfo) bitmapInfo
+{
+   return( _bitmap.info);
+}
+
+
+- (struct mulle_allocator *)  bitmapAllocator;
+{
+   return( _bitmap.allocator);
+}
+
+- (void *) bytes
+{
+   return( _bitmap.bytes);
 }
 
 
 - (void *) RGBABytes
 {
-   if( _bitmapInfo.encoding == CGBitmapEncodingRGBABytes)
-      return( _bytes);
+   if( _bitmap.info.encoding == CGBitmapEncodingRGBABytes)
+      return( _bitmap.bytes);
    return( NULL);
 }
 
 
 - (NSUInteger) length
 {
-   return( CGBitmapInfoGetAllocationSize( _bitmapInfo));
+   return( CGBitmapInfoGetAllocationSize( _bitmap.info));
 }
 
 
 - (BOOL) isFlipped
 {
-   return( CGBitmapEncodingIsFlipped( _bitmapInfo.encoding));
+   return( CGBitmapEncodingIsFlipped( _bitmap.info.encoding));
 }
 
 
 - (UIBitmapImage *) flippedImage
 {
-   UIBitmapImage            *flipped;
    struct mulle_allocator   *allocator;
-   struct CGBitmapInfo      bitmapInfo;
-   struct mulle_data        src_data;
-   struct mulle_data        data;
-   NSInteger                line_length;
-   uint8_t                  *src;
-   uint8_t                  *dst;
-   uint8_t                  *sentinel;
+
+   allocator = MulleObjCInstanceGetAllocator( self);
+   return( [self flippedImageWithAllocator:allocator]);
+}
+
+
+- (UIBitmapImage *) flippedImageWithAllocator:(struct mulle_allocator *) allocator
+{
+   UIBitmapImage         *flipped;
+   struct CGBitmapInfo   bitmapInfo;
+   struct mulle_data     src_data;
+   struct mulle_data     data;
+   NSInteger             line_length;
+   uint8_t               *src;
+   uint8_t               *dst;
+   uint8_t               *sentinel;
 
    // don't use _allocator, could be the stbi one
-   bitmapInfo  = [self bitmapInfo];
+   bitmapInfo          = _bitmap.info;
    bitmapInfo.encoding = CGBitmapEncodingByFlipping( bitmapInfo.encoding);
 
    src_data.bytes  = [self bytes];
    src_data.length = CGBitmapInfoGetAllocationSize( bitmapInfo);
    line_length     = CGBitmapInfoGetLineSize( bitmapInfo);
 
-   allocator   = MulleObjCInstanceGetAllocator( self);
    data.length = src_data.length;
+   allocator   = allocator ? allocator : &mulle_default_allocator;
    data.bytes  = mulle_allocator_malloc( allocator, data.length);
    dst         = data.bytes;
    sentinel    = &dst[ data.length - line_length];
@@ -224,9 +275,9 @@ static const struct mulle_allocator    stbi_allocator;
       dst = &dst[ line_length];
    }
 
-   flipped   = [[[UIBitmapImage alloc] initWithBytes:data.bytes
-                                          bitmapInfo:bitmapInfo
-                                           allocator:allocator] autorelease];
+   flipped = [[[UIBitmapImage alloc] initWithBytes:data.bytes
+                                        bitmapInfo:bitmapInfo
+                                         allocator:allocator] autorelease];
    return( flipped);
 }
 
@@ -241,12 +292,12 @@ static const struct mulle_allocator    stbi_allocator;
    int                   i;
    int                   j;
 
-   bitmapInfo = [self bitmapInfo];
+   bitmapInfo = _bitmap.info;
 
    //
    // if imageFlags comes in asking for flipped and internal representation
    // is flipped already, then clear, otherwise set for "normal" display
-   if( CGBitmapEncodingIsFlipped( _bitmapInfo.encoding))
+   if( CGBitmapEncodingIsFlipped( bitmapInfo.encoding))
       imageFlags ^= NVG_IMAGE_FLIPY;
 
    // map imageFlags hopefully to a cachable index

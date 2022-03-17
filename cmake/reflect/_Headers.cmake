@@ -54,7 +54,7 @@ src/import.h
 set( PUBLIC_HEADERS
 nanosvg/src/nanosvg.h
 nanosvg/src/nanosvgrast.h
-src/CGLayer+UIBitmapImage.h
+src/CGImage+UIBitmapImage.h
 src/MulleObjCLoader+MulleUIImage.h
 src/MulleUIImage.h
 src/UIBitmapImage+BMPWriter.h

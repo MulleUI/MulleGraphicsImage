@@ -11,7 +11,7 @@ endif()
 # contents selected with patternfile ??-source--sources
 #
 set( SOURCES
-src/CGLayer+UIBitmapImage.m
+src/CGImage+UIBitmapImage.m
 src/UIBitmapImage+BMPWriter.m
 src/UIBitmapImage+PNGWriter.m
 src/UIBitmapImage.m

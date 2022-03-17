@@ -55,8 +55,8 @@
       return( NO);
    return( bmp_rgba32_write_file( filename,
                                   bytes,
-                                  _bitmapInfo.size.width,
-                                  _bitmapInfo.size.height,
+                                  _bitmap.info.size.width,
+                                  _bitmap.info.size.height,
                                   0) ? NO : YES);
 }
 
