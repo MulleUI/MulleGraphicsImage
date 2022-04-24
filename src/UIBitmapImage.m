@@ -47,7 +47,6 @@
 
 static const struct mulle_allocator    stbi_allocator;
 
-
 + (void) load
 {
    stbi_set_unpremultiply_on_load( 1);
@@ -203,6 +202,13 @@ static const struct mulle_allocator    stbi_allocator;
    return( _bitmap.allocator);
 }
 
+
+- (UIBitmapImage *) bitmapImage
+{
+   return( self);
+}
+
+
 - (void *) bytes
 {
    return( _bitmap.bytes);
@@ -229,16 +235,16 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
-- (UIBitmapImage *) flippedImage
+- (UIBitmapImage *) flippedBitmapImage
 {
    struct mulle_allocator   *allocator;
 
    allocator = MulleObjCInstanceGetAllocator( self);
-   return( [self flippedImageWithAllocator:allocator]);
+   return( [self flippedBitmapImageWithAllocator:allocator]);
 }
 
 
-- (UIBitmapImage *) flippedImageWithAllocator:(struct mulle_allocator *) allocator
+- (UIBitmapImage *) flippedBitmapImageWithAllocator:(struct mulle_allocator *) allocator
 {
    UIBitmapImage         *flipped;
    struct CGBitmapInfo   bitmapInfo;
@@ -279,6 +285,74 @@ static const struct mulle_allocator    stbi_allocator;
                                         bitmapInfo:bitmapInfo
                                          allocator:allocator] autorelease];
    return( flipped);
+}
+
+
+
+- (BOOL) _isFullyTransparentRGBABytes
+{
+   struct CGBitmapInfo   bitmapInfo;
+   NSInteger             line_length;
+   uint8_t               *src;
+   uint8_t               *p;
+   NSUInteger            x;
+   NSUInteger            y;
+
+   bitmapInfo  = _bitmap.info;
+   src         = [self bytes];
+
+   for( y = 0; y < bitmapInfo.size.height; y++)
+   {
+      p = &src[ 3];
+      for( x = 0; x < bitmapInfo.size.width; x++)
+      {
+         if( *p)
+            return( NO);
+         p += 4;
+      }
+      src = CGBitmapInfoNextLineBytes( bitmapInfo, src);
+   }
+   return( YES);
+}
+
+
+- (BOOL) _isFullyTransparentRGBAFloats
+{
+   struct CGBitmapInfo   bitmapInfo;
+   NSInteger             line_length;
+   float                 *src;
+   float                 *p;
+   NSUInteger            x;
+   NSUInteger            y;
+
+   bitmapInfo  = _bitmap.info;
+   src         = [self bytes];
+
+   for( y = 0; y < bitmapInfo.size.height; y++)
+   {
+      p = &src[ 3];
+      for( x = 0; x < bitmapInfo.size.width; x++)
+      {
+         if( *p != 0.0)
+            return( NO);
+         p += 4;
+      }
+      src = CGBitmapInfoNextLineBytes( bitmapInfo, src);
+   }
+   return( YES);
+}
+
+
+- (BOOL) isFullyTransparent
+{
+   struct CGBitmapInfo   bitmapInfo;
+
+   bitmapInfo   = _bitmap.info;
+   if( CGBitmapEncodingIsRGBABytes( bitmapInfo.encoding))
+      return( [self _isFullyTransparentRGBABytes]);
+   if( CGBitmapEncodingIsRGBAFloats( bitmapInfo.encoding))
+      return( [self _isFullyTransparentRGBAFloats]);
+   return( NO);
 }
 
 

@@ -45,7 +45,7 @@
    void   *bytes;
 
    if( [self isFlipped])
-      return( [[self flippedImage] writeToBMPFileWithSystemRepresentation:filename]);
+      return( [[self flippedBitmapImage] writeToBMPFileWithSystemRepresentation:filename]);
 
    if( ! filename || ! *filename)
       return( NO);

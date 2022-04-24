@@ -137,10 +137,11 @@
 - (void *) RGBABytes;
 
 // vertically flipped that is
-- (UIBitmapImage *) flippedImageWithAllocator:(struct mulle_allocator *) allocator;
-- (UIBitmapImage *) flippedImage;
+- (UIBitmapImage *) flippedBitmapImageWithAllocator:(struct mulle_allocator *) allocator;
+- (UIBitmapImage *) flippedBitmapImage;
+- (UIBitmapImage *) bitmapImage; // will return self
 
 - (BOOL) isFlipped;
-
+- (BOOL) isFullyTransparent;  // if all bytes alpha is 0 it is fully transparent
 
 @end

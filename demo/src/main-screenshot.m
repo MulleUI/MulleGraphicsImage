@@ -1,5 +1,5 @@
 #import <MulleUIImage/MulleUIImage.h>
-#import <MulleUICore/MulleUICore.h>
+#import "import.h"
 
 
 

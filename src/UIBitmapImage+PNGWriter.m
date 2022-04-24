@@ -39,12 +39,12 @@ static unsigned char  *compress_for_stbiw( unsigned char *data,
 
 - (BOOL) writeToPNGFileWithSystemRepresentation:(char *) filename
 {
-   int                      rval;
+   int                   rval;
    struct CGBitmapInfo   bitmapInfo;
-   void                     *bytes;
+   void                  *bytes;
 
    if( [self isFlipped])
-      return( [[self flippedImage] writeToPNGFileWithSystemRepresentation:filename]);
+      return( [[self flippedBitmapImage] writeToPNGFileWithSystemRepresentation:filename]);
 
    bytes = [self bytes];
    if( ! bytes)
