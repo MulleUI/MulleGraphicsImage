@@ -58,6 +58,7 @@ src/CGImage+UIBitmapImage.h
 src/MulleObjCLoader+MulleUIImage.h
 src/MulleUIImage.h
 src/UIBitmapImage+BMPWriter.h
+src/UIBitmapImage+GIFWriter.h
 src/UIBitmapImage+PNGWriter.h
 src/UIBitmapImage.h
 src/UIImage.h

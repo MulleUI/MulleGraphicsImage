@@ -46,6 +46,6 @@
 
 @interface UIBitmapImage( BMPWriter)
 
-- (BOOL) writeToBMPFileWithSystemRepresentation:(char *) filename;
+- (BOOL) writeToBMPUTF8String:(char *) filename;
 
 @end

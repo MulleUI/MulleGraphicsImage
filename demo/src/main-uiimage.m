@@ -22,7 +22,7 @@ static void   setupSceneInWindow( UIWindow *window)
    if( ! image)
    {
       fprintf( stderr, "image \"parrot.png\" not found\n");
-      exit( 1);
+      _exit( 1);
    }
    [layer setImage:image];
 

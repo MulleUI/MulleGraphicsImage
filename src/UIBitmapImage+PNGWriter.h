@@ -19,7 +19,7 @@
 @interface UIBitmapImage( PNGWriter)
 
 - (struct mulle_data) PNGCData; // autoreleases
-- (BOOL) writeToPNGFileWithSystemRepresentation:(char *) filename;
+- (BOOL) writeToPNGUTF8String:(char *) filename;
 
 @end
 

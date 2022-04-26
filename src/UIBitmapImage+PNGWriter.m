@@ -37,14 +37,14 @@ static unsigned char  *compress_for_stbiw( unsigned char *data,
 
 @implementation UIBitmapImage ( PNGWriter)
 
-- (BOOL) writeToPNGFileWithSystemRepresentation:(char *) filename
+- (BOOL) writeToPNGUTF8String:(char *) filename
 {
    int                   rval;
    struct CGBitmapInfo   bitmapInfo;
    void                  *bytes;
 
    if( [self isFlipped])
-      return( [[self flippedBitmapImage] writeToPNGFileWithSystemRepresentation:filename]);
+      return( [[self flippedBitmapImage] writeToPNGUTF8String:filename]);
 
    bytes = [self bytes];
    if( ! bytes)
@@ -84,7 +84,7 @@ static void   append_data(void *context, void *data, int size)
    if( ! bytes)
       return( mulle_data_make_invalid());
 
-   lineLength = CGBitmapInfoGetLineSize( bitmapInfo);
+   lineLength = CGBitmapInfoGetLineLength( bitmapInfo);
 
    mulle_buffer_init_with_capacity( &buffer,
                                     1024 + bitmapInfo.size.width * lineLength,

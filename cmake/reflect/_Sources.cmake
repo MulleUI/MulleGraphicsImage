@@ -13,6 +13,7 @@ endif()
 set( SOURCES
 src/CGImage+UIBitmapImage.m
 src/UIBitmapImage+BMPWriter.m
+src/UIBitmapImage+GIFWriter.m
 src/UIBitmapImage+PNGWriter.m
 src/UIBitmapImage.m
 src/UIImage.m

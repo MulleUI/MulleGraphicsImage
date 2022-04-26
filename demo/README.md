@@ -1,11 +1,21 @@
 # demos
 
-#### 🙄 demos do something
+#### 👀 demos for MulleUIImage
 
-The demos actually require MulleUICore to run. It's to tedious to set
-everything up again for linking with glfw and basically that's what
-MulleUICore is there for anyway.
+The demos require MulleUI to run.
 
+# uiimage
+
+This demo reads a `parrot.jpg` file and displays it
+
+![](uiimage.png)
+
+# animatedgif
+
+This demo creates 10 frames of a simple animation with `parrot.jpg` and
+produces an animated GIF with them
+
+![](animated.gif)
 
 ## Build
 

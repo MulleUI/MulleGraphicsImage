@@ -2,8 +2,7 @@
 #import "import.h"
 
 
-
-static void   setupSceneInWindow( UIWindow *window)
+static UIView   *setupSceneInWindow( UIWindow *window)
 {
    CAImageLayer    *layer;
    UIImage         *image;
@@ -22,33 +21,67 @@ static void   setupSceneInWindow( UIWindow *window)
    if( ! image)
    {
       fprintf( stderr, "image \"parrot.png\" not found\n");
-      exit( 1);
+      _exit( 1);
    }
    [layer setImage:image];
-   [layer setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
 
-   view = [UIView viewWithLayer:layer];
+   view  = [UIView viewWithLayer:layer];
+   [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
+
    [contentPlane addSubview:view];
+
+   return( view);
 }
 
 
 int   main( int argc, char *argv[])
 {
-   UIWindow        *window;
-   UIApplication   *app;
+   UIWindow            *window;
+   UIApplication       *app;
+   UIAnimatedGIF       *gif;
+   NSUInteger          i;
+   UIView              *view;
+   CGAffineTransform   xform;
+   CGRect              frame;
+   CGRect              newFrame;
+   struct CGBitmap     screenshotBitmap;
 
-   app = [UIApplication sharedInstance];
+   app    = [UIApplication sharedInstance];
+   window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 400.0, 300.0)
+                      titleUTF8String:NULL
+                            styleMask:UIWindowStyleBare|UIWindowStyleInvisible];
+   assert( window);
+
+   [window setBackgroundColor:CGColorMakeRGBA( 0.5, 0.5, 0.5, 1.0)];
+
+   view = setupSceneInWindow( window);
+
+   gif  = [UIAnimatedGIF animatedGIFUTF8String:"animated.gif"
+                                    bitmapSize:CGBitmapSizeMake( 400, 300)
+                                     frameRate:1.0];
+
+   xform = CGAffineTransformMakeScaleInline( 0.9, 0.9);
+
+   for( i = 0; i < 10; i++)
    {
-      window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
-      assert( window);
+      [window renderAndSwapOneFrame];
 
-      [window setBackgroundColor:CGColorMakeRGBA( 0.5, 0.5, 0.5, 1.0)];
+      screenshotBitmap = [window screenshotBitmap];
+      [gif addBitmap:&screenshotBitmap
+        freeWhenDone:YES];
+      [gif setFrameRate:1.0 / 15.0];
+      frame    = [view frame];
+      newFrame = CGRectApplyAffineTransformAtAnchorPoint( frame, xform, CGPointMake( 0.5, 0.5));
+      [view setFrame:newFrame];
 
-      setupSceneInWindow( window);
+      MulleUICLog( "%s -> %s", CGRectUTF8String( frame), CGRectUTF8String( newFrame));
 
-      [app addWindow:window];
+      [window setNeedsDisplay];
    }
-   return( [app run]);
+
+   [gif close];
+
+   return( 0);
 }
 
 

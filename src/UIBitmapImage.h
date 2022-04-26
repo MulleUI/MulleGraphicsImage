@@ -98,10 +98,12 @@
 }
 
 
-// The bitmap info will be copied and the data owned (not copied!) by
-// UIBitmapImage.
-// So usually the caller shouldn't touch bitmap afterwards
-+ (instancetype) imageWithBitmap:(struct CGBitmap *) bitmap;
+// Pass in a bitmap and if freeWhenDone is set, then the allocator of the
+// UIBitmapImage is set to NULL, which will keep the bitmap intact. If the
+// bitmap has no allocator, freeWhenDone=YES will not do anything also.
+//
++ (instancetype) imageWithBitmap:(struct CGBitmap *) bitmap
+                    freeWhenDone:(BOOL) flag;
 
 // if allocator is NULL, then no free on release
 + (instancetype) imageWithBytes:(void *) bytes
@@ -109,10 +111,8 @@
                       allocator:(struct mulle_allocator *) allocator;
 
 
-// The bitmap info will be copied and the data owned (not copied!) by
-// UIBitmapImage.
-// So usually the caller shouldn't touch bitmap afterwards
-- (instancetype) initWithBitmap:(struct CGBitmap *) bitmap;
+- (instancetype) initWithBitmap:(struct CGBitmap *) bitmap
+                    freeWhenDone:(BOOL) flag;
 
 // if allocator is NULL, then no free on release
 - (instancetype) initWithBytes:(void *) bytes
@@ -143,5 +143,13 @@
 
 - (BOOL) isFlipped;
 - (BOOL) isFullyTransparent;  // if all bytes alpha is 0 it is fully transparent
+
+//
+// This can resize and reencode bitmap images. It's very generic and very
+// slow on resize and also of low quality. Reencoding by keeping the bitmapSize
+// can be more useful.
+//
+- (UIBitmapImage *) bitmapImageForBitmapInfo:(struct CGBitmapInfo) convertedBitmapInfo
+                                   allocator:(struct mulle_allocator *) allocator;
 
 @end

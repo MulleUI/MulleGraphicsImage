@@ -13,7 +13,8 @@
    struct CGBitmap   bitmap;
 
    bitmap = [self RGBABytesBitmap:&mulle_default_allocator];
-   image  = [[[UIBitmapImage alloc] initWithBitmap:&bitmap] autorelease];
+   image  = [[[UIBitmapImage alloc] initWithBitmap:&bitmap
+                                      freeWhenDone:YES] autorelease];
    return( image);
 }
 

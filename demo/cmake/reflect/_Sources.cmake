@@ -11,6 +11,7 @@ endif()
 # contents selected with patternfile ??-source--sources
 #
 set( SOURCES
+src/main-animatedgif.m
 src/main-screenshot.m
 src/main-uiimage.m
 )

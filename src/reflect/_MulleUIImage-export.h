@@ -12,6 +12,7 @@
 #import "CGImage+UIBitmapImage.h"
 #import "MulleObjCLoader+MulleUIImage.h"
 #import "UIBitmapImage+BMPWriter.h"
+#import "UIBitmapImage+GIFWriter.h"
 #import "UIBitmapImage+PNGWriter.h"
 #import "UIBitmapImage.h"
 #import "UIImage.h"

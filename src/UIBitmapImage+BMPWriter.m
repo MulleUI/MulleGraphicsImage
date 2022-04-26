@@ -40,12 +40,12 @@
 
 @implementation UIBitmapImage ( BMPWriter)
 
-- (BOOL) writeToBMPFileWithSystemRepresentation:(char *) filename
+- (BOOL) writeToBMPUTF8String:(char *) filename
 {
    void   *bytes;
 
    if( [self isFlipped])
-      return( [[self flippedBitmapImage] writeToBMPFileWithSystemRepresentation:filename]);
+      return( [[self flippedBitmapImage] writeToBMPUTF8String:filename]);
 
    if( ! filename || ! *filename)
       return( NO);

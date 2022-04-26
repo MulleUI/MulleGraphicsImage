@@ -60,9 +60,12 @@ static const struct mulle_allocator    stbi_allocator;
 
 
 + (instancetype) imageWithBitmap:(struct CGBitmap *) bitmap
+                    freeWhenDone:(BOOL) flag
 {
-   return( [[[self alloc] initWithBitmap:bitmap] autorelease]);
+   return( [[[self alloc] initWithBitmap:bitmap
+                            freeWhenDone:flag] autorelease]);
 }
+
 
 
 + (instancetype) imageWithBytes:(void *) bytes
@@ -76,6 +79,7 @@ static const struct mulle_allocator    stbi_allocator;
 
 
 - (instancetype) initWithBitmap:(struct CGBitmap *) bitmap
+                   freeWhenDone:(BOOL) flag
 {
    if( ! bitmap || ! bitmap->bytes)
    {
@@ -83,7 +87,12 @@ static const struct mulle_allocator    stbi_allocator;
       return( nil);
    }
 
-   _bitmap = *bitmap;
+   assert( bitmap->info.size.height >= 1);
+   assert( bitmap->info.size.width >= 1);
+
+   _bitmap           = *bitmap;
+   _bitmap.allocator = flag ? bitmap->allocator : NULL;
+
 // we don't need to do this, as its just a memset 0
 //   for( i = 0; i < 0x4ß; i++)
 //   _mulle__pointermap_init( &_context_map[ i], 0, MulleObjCInstanceGetAllocator( self));
@@ -261,7 +270,7 @@ static const struct mulle_allocator    stbi_allocator;
 
    src_data.bytes  = [self bytes];
    src_data.length = CGBitmapInfoGetAllocationSize( bitmapInfo);
-   line_length     = CGBitmapInfoGetLineSize( bitmapInfo);
+   line_length     = CGBitmapInfoGetLineLength( bitmapInfo);
 
    data.length = src_data.length;
    allocator   = allocator ? allocator : &mulle_default_allocator;
@@ -310,7 +319,7 @@ static const struct mulle_allocator    stbi_allocator;
             return( NO);
          p += 4;
       }
-      src = CGBitmapInfoNextLineBytes( bitmapInfo, src);
+      src = CGBitmapInfoGetNextLineBytes( bitmapInfo, src);
    }
    return( YES);
 }
@@ -337,7 +346,7 @@ static const struct mulle_allocator    stbi_allocator;
             return( NO);
          p += 4;
       }
-      src = CGBitmapInfoNextLineBytes( bitmapInfo, src);
+      src = CGBitmapInfoGetNextLineBytes( bitmapInfo, src);
    }
    return( YES);
 }
@@ -460,6 +469,68 @@ static const struct mulle_allocator    stbi_allocator;
          [image autorelease];
       }
    }
+}
+
+
+enum
+{
+   NoChange       = 0,
+   GeometryChange = 0x1,
+   StrideChange   = 0x2,
+   EncodingChange = 0x4
+};
+
+
+- (UIBitmapImage *) bitmapImageForBitmapInfo:(struct CGBitmapInfo) convertedBitmapInfo
+                                   allocator:(struct mulle_allocator *) allocator
+{
+   struct CGBitmap       convertedBitmap;
+   struct CGBitmapInfo   bitmapInfo;
+   NSUInteger            change;
+   void                  *bytes;
+   NSUInteger            length;
+   NSInteger             y;
+
+   bitmapInfo = [self bitmapInfo];
+   change     = NoChange;
+   if( CGBitmapInfoGetEncoding( bitmapInfo) != CGBitmapInfoGetEncoding( convertedBitmapInfo))
+      change |= EncodingChange;
+      // just a geometry change ?
+   if( ! CGBitmapSizeEqualToBitmapSize( bitmapInfo.size, convertedBitmapInfo.size))
+      change |= GeometryChange;
+   if( bitmapInfo.stride != convertedBitmapInfo.stride)
+      change |= StrideChange;
+      // just a stride change
+
+   switch( change)
+   {
+   case NoChange     : return( self);
+   case StrideChange : // just reorganize
+      bytes  = mulle_allocator_malloc( allocator, CGBitmapInfoGetAllocationSize( convertedBitmapInfo));
+      CGBitmapInit( &convertedBitmap, bytes, convertedBitmapInfo, allocator);
+      length = CGBitmapInfoGetLineLength( convertedBitmapInfo);
+      for( y = 0; y < convertedBitmapInfo.size.height; y++)
+      {
+         memcpy( _CGBitmapGetLineBytes( &convertedBitmap, y),
+                 _CGBitmapGetLineBytes( &_bitmap, y),
+                 length);
+      }
+      break;
+
+   default :
+      switch( CGBitmapInitWithBitmapConversion( &convertedBitmap,
+                                                convertedBitmapInfo,
+                                                _bitmap,
+                                                allocator))
+      {
+      case -1 : abort();
+      case 0  : return( self);
+      }
+      break;
+   }
+
+   return( [UIBitmapImage imageWithBitmap:&convertedBitmap
+                             freeWhenDone:YES]);
 }
 
 @end
