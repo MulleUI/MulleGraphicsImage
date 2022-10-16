@@ -1,6 +1,7 @@
 #import <MulleUIImage/MulleUIImage.h>
 #import "import.h"
 
+#include <unistd.h> // for _exit
 
 
 static void   setupSceneInWindow( UIWindow *window)
@@ -27,7 +28,7 @@ static void   setupSceneInWindow( UIWindow *window)
    [layer setImage:image];
 
    view  = [UIView viewWithLayer:layer];
-   [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
+   [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
    [contentPlane addSubview:view];
 }
@@ -43,7 +44,7 @@ int   main( int argc, char *argv[])
       window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
       assert( window);
 
-      [window setBackgroundColor:CGColorMakeRGBA( 0.5, 0.5, 0.5, 1.0)];
+      [window setBackgroundColor:CGColorMakeWithRGBA( 0.5, 0.5, 0.5, 1.0)];
 
       setupSceneInWindow( window);
 

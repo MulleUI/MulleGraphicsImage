@@ -13,13 +13,13 @@
 
 // You can tweak the following #import with these commands.
 // (Use BE03CBCA-C69F-4FCD-AFC5-69A20255D4EE instead of MulleGraphics if there are duplicate entries)
-//    remove:             `mulle-sde dependency mark MulleGraphics no-header`
-//    rename:             `mulle-sde dependency|library set MulleGraphics include whatever.h`
-//    reorder:            `mulle-sde dependency move MulleGraphics <up|down>`
+//    remove #import: : `mulle-sde dependency mark MulleGraphics no-header`
+//    rename:              `mulle-sde dependency|library set MulleGraphics include whatever.h`
+//    reorder:             `mulle-sde dependency move MulleGraphics <up|down>`
 //    toggle #import:     `mulle-sde dependency mark MulleGraphics [no-]import`
-//    toggle public:      `mulle-sde dependency mark MulleGraphics [no-]public`
-//    toggle optional:    `mulle-sde dependency mark MulleGraphics [no-]require`
-//    remove for platform:`mulle-sde dependency mark MulleGraphics no-platform-<uname>`
+//    toggle public:       `mulle-sde dependency mark MulleGraphics [no-]public`
+//    toggle optional:     `mulle-sde dependency mark MulleGraphics [no-]require`
+//    remove for platform: `mulle-sde dependency mark MulleGraphics no-platform-<uname>`
 //        (use `mulle-sourcetree-to-c --unames` to list known values)
 #import <MulleGraphics/MulleGraphics.h>   // MulleGraphics
 

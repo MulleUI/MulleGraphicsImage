@@ -1,6 +1,8 @@
 #import <MulleUIImage/MulleUIImage.h>
 #import "import.h"
 
+#include <unistd.h> // for _exit
+
 
 static UIView   *setupSceneInWindow( UIWindow *window)
 {
@@ -26,7 +28,7 @@ static UIView   *setupSceneInWindow( UIWindow *window)
    [layer setImage:image];
 
    view  = [UIView viewWithLayer:layer];
-   [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
+   [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
    [contentPlane addSubview:view];
 
@@ -52,13 +54,14 @@ int   main( int argc, char *argv[])
                             styleMask:UIWindowStyleBare|UIWindowStyleInvisible];
    assert( window);
 
-   [window setBackgroundColor:CGColorMakeRGBA( 0.5, 0.5, 0.5, 1.0)];
+   [window setBackgroundColor:CGColorMakeWithRGBA( 0.5, 0.5, 0.5, 1.0)];
 
    view = setupSceneInWindow( window);
 
-   gif  = [UIAnimatedGIF animatedGIFUTF8String:"animated.gif"
-                                    bitmapSize:CGBitmapSizeMake( 400, 300)
-                                     frameRate:1.0];
+   gif  = [UIAnimatedGIF animatedGIFWithUTF8String:"animated.gif"
+                                    bitmapSize:MulleIntegerSizeMake( 200, 150)
+                                     frameRate:1.0
+                                          loop:YES];
 
    xform = CGAffineTransformMakeScaleInline( 0.9, 0.9);
 
@@ -67,9 +70,14 @@ int   main( int argc, char *argv[])
       [window renderAndSwapOneFrame];
 
       screenshotBitmap = [window screenshotBitmap];
-      [gif addBitmap:&screenshotBitmap
+      [gif addBitmap:screenshotBitmap
         freeWhenDone:YES];
       [gif setFrameRate:1.0 / 15.0];
+
+      //
+      // View frame animation is lazy. Usually you would code the animation in
+      // the CALayer and use the bounds for scaling.
+      //
       frame    = [view frame];
       newFrame = CGRectApplyAffineTransformAtAnchorPoint( frame, xform, CGPointMake( 0.5, 0.5));
       [view setFrame:newFrame];
@@ -81,6 +89,11 @@ int   main( int argc, char *argv[])
 
    [gif close];
 
+   fprintf( stderr, 
+"--------------------------------------------------------------\n"
+"This Demo is non-interactive. It produced an animated GIF file\n"
+"\"animated.gif\"\n."
+"--------------------------------------------------------------\n");
    return( 0);
 }
 

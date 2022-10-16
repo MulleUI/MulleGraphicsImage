@@ -67,21 +67,26 @@ struct UIGIFWriter
    struct UIGIFWriter   _writer;
 }
 
-@property( assign) struct CGBitmapSize        bitmapSize;
+@property( assign) struct MulleIntegerSize    bitmapSize;
 @property( assign) CGFloat                    frameRate;
 // @property( assign) NSUInteger                 bitDepth; // fixed to 8
 @property( assign, getter=isDithering) BOOL   dithering;
 
-+ (instancetype) animatedGIFUTF8String:(char *) filename
-                                              bitmapSize:(struct CGBitmapSize) bitmapSize
-                                               frameRate:(CGFloat) frameRate;
++ (instancetype) animatedGIFWithUTF8String:(char *) filename
+                                bitmapSize:(struct MulleIntegerSize) bitmapSize
+                                 frameRate:(CGFloat) frameRate
+                                      loop:(BOOL) loop;
+
 - (instancetype) initWithUTF8String:(char *) filename
-                                       bitmapSize:(struct CGBitmapSize) bitmapSize
-                                        frameRate:(CGFloat) frameRate;
+                         bitmapSize:(struct MulleIntegerSize) bitmapSize
+                          frameRate:(CGFloat) frameRate
+                               loop:(BOOL) loop;
 - (BOOL) writeBytes:(void *) bytes;
 - (BOOL) close;
 
-- (BOOL) addBitmap:(struct CGBitmap *) bitmap
+// pass structs by value for use with NSInvocation, otherwise promote
+// to object
+- (BOOL) addBitmap:(struct CGBitmap) bitmap
       freeWhenDone:(BOOL) flag;
 - (BOOL) addBitmapImage:(UIBitmapImage *) image;
 
@@ -94,3 +99,10 @@ struct UIGIFWriter
 - (BOOL) writeToAnimatedGIF:(UIAnimatedGIF *) gif;
 
 @end
+
+
+@interface CGImage( GIFWriter)
+
+- (BOOL) writeToGIFUTF8String:(char *) filename;
+
+@end 

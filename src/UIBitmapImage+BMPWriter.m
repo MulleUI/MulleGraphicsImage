@@ -37,6 +37,8 @@
 
 #import "import-private.h"
 
+#import "CGImage+UIBitmapImage.h"
+
 
 @implementation UIBitmapImage ( BMPWriter)
 
@@ -58,6 +60,16 @@
                                   _bitmap.info.size.width,
                                   _bitmap.info.size.height,
                                   0) ? NO : YES);
+}
+
+@end
+
+
+@implementation CGImage( BMPWriter)
+
+- (BOOL) writeToBMPUTF8String:(char *) filename
+{
+   return( [[self bitmapImage] writeToBMPUTF8String:filename]);
 }
 
 @end

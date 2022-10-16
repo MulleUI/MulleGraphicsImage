@@ -9,4 +9,5 @@
  *
  *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
  */
+#include "bengal.jpg.inc"
 #include "demos-version.h"

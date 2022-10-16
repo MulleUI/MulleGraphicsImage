@@ -207,3 +207,83 @@ if( NOT MULLE_OBJC_STARTUP_LIBRARY)
       message( FATAL_ERROR "MULLE_OBJC_STARTUP_LIBRARY was not found")
    endif()
 endif()
+
+
+#
+# Generated from sourcetree: 15A943E7-37CF-44CC-9474-39A8E33BAE4A;MulleUIControl;no-singlephase;
+# Disable with : `mulle-sourcetree mark MulleUIControl no-link`
+# Disable for this platform: `mulle-sourcetree mark MulleUIControl no-cmake-platform-${MULLE_UNAME}`
+#
+if( NOT MULLE_UI_CONTROL_LIBRARY)
+   find_library( MULLE_UI_CONTROL_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}MulleUIControl${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX} ${CMAKE_STATIC_LIBRARY_PREFIX}MulleUIControl${CMAKE_STATIC_LIBRARY_SUFFIX} MulleUIControl NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
+   message( STATUS "MULLE_UI_CONTROL_LIBRARY is ${MULLE_UI_CONTROL_LIBRARY}")
+   #
+   # The order looks ascending, but due to the way this file is read
+   # it ends up being descending, which is what we need.
+   #
+   if( MULLE_UI_CONTROL_LIBRARY)
+      #
+      # Add MULLE_UI_CONTROL_LIBRARY to ALL_LOAD_DEPENDENCY_LIBRARIES list.
+      # Disable with: `mulle-sourcetree mark MulleUIControl no-cmake-add`
+      #
+      set( ALL_LOAD_DEPENDENCY_LIBRARIES
+         ${ALL_LOAD_DEPENDENCY_LIBRARIES}
+         ${MULLE_UI_CONTROL_LIBRARY}
+         CACHE INTERNAL "need to cache this"
+      )
+      #
+      # Inherit information from dependency.
+      # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
+      # Disable with: `mulle-sourcetree mark MulleUIControl no-cmake-inherit`
+      #
+      # temporarily expand CMAKE_MODULE_PATH
+      get_filename_component( _TMP_MULLE_UI_CONTROL_ROOT "${MULLE_UI_CONTROL_LIBRARY}" DIRECTORY)
+      get_filename_component( _TMP_MULLE_UI_CONTROL_ROOT "${_TMP_MULLE_UI_CONTROL_ROOT}" DIRECTORY)
+      #
+      #
+      # Search for "DependenciesAndLibraries.cmake" to include.
+      # Disable with: `mulle-sourcetree mark MulleUIControl no-cmake-dependency`
+      #
+      foreach( _TMP_MULLE_UI_CONTROL_NAME "MulleUIControl")
+         set( _TMP_MULLE_UI_CONTROL_DIR "${_TMP_MULLE_UI_CONTROL_ROOT}/include/${_TMP_MULLE_UI_CONTROL_NAME}/cmake")
+         # use explicit path to avoid "surprises"
+         if( EXISTS "${_TMP_MULLE_UI_CONTROL_DIR}/DependenciesAndLibraries.cmake")
+            unset( MULLE_UI_CONTROL_DEFINITIONS)
+            list( INSERT CMAKE_MODULE_PATH 0 "${_TMP_MULLE_UI_CONTROL_DIR}")
+            #
+            include( "${_TMP_MULLE_UI_CONTROL_DIR}/DependenciesAndLibraries.cmake")
+            #
+            #
+            list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_UI_CONTROL_DIR}")
+            set( INHERITED_DEFINITIONS
+               ${INHERITED_DEFINITIONS}
+               ${MULLE_UI_CONTROL_DEFINITIONS}
+               CACHE INTERNAL "need to cache this"
+            )
+            break()
+         else()
+            message( STATUS "${_TMP_MULLE_UI_CONTROL_DIR}/DependenciesAndLibraries.cmake not found")
+         endif()
+      endforeach()
+      #
+      # Search for "MulleObjCLoader+<name>.h" in include directory.
+      # Disable with: `mulle-sourcetree mark MulleUIControl no-cmake-loader`
+      #
+      if( NOT NO_INHERIT_OBJC_LOADERS)
+         foreach( _TMP_MULLE_UI_CONTROL_NAME "MulleUIControl")
+            set( _TMP_MULLE_UI_CONTROL_FILE "${_TMP_MULLE_UI_CONTROL_ROOT}/include/${_TMP_MULLE_UI_CONTROL_NAME}/MulleObjCLoader+${_TMP_MULLE_UI_CONTROL_NAME}.h")
+            if( EXISTS "${_TMP_MULLE_UI_CONTROL_FILE}")
+               set( INHERITED_OBJC_LOADERS
+                  ${INHERITED_OBJC_LOADERS}
+                  ${_TMP_MULLE_UI_CONTROL_FILE}
+                  CACHE INTERNAL "need to cache this"
+               )
+               break()
+            endif()
+         endforeach()
+      endif()
+   else()
+      # Disable with: `mulle-sourcetree mark MulleUIControl no-require-link`
+      message( FATAL_ERROR "MULLE_UI_CONTROL_LIBRARY was not found")
+   endif()
+endif()

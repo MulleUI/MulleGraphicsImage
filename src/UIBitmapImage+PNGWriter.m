@@ -5,6 +5,8 @@
 
 #import "import-private.h"
 
+#import "CGImage+UIBitmapImage.h"
+
 #include <zlib.h>
 
 // stolen from https://github.com/DanielGibson/stb/commit/1dae231b1ec01b403a937ffe04421ca4e287efc2
@@ -110,3 +112,15 @@ static void   append_data(void *context, void *data, int size)
 }
 
 @end
+
+
+@implementation CGImage( PNGWriter)
+
+- (BOOL) writeToPNGUTF8String:(char *) filename
+{
+   return( [[self bitmapImage] writeToPNGUTF8String:filename]);
+}
+
+@end
+
+

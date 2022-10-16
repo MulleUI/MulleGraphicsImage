@@ -59,7 +59,7 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
-+ (instancetype) imageWithBitmap:(struct CGBitmap *) bitmap
++ (instancetype) imageWithBitmap:(struct CGBitmap) bitmap
                     freeWhenDone:(BOOL) flag
 {
    return( [[[self alloc] initWithBitmap:bitmap
@@ -78,20 +78,21 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
-- (instancetype) initWithBitmap:(struct CGBitmap *) bitmap
+- (instancetype) initWithBitmap:(struct CGBitmap) bitmap
                    freeWhenDone:(BOOL) flag
 {
-   if( ! bitmap || ! bitmap->bytes)
+   if( CGBitmapIsNull( bitmap))
    {
       [self release];
       return( nil);
    }
 
-   assert( bitmap->info.size.height >= 1);
-   assert( bitmap->info.size.width >= 1);
+   assert( bitmap.info.size.height >= 1);
+   assert( bitmap.info.size.width >= 1);
+   assert( ! flag || bitmap.allocator);
 
-   _bitmap           = *bitmap;
-   _bitmap.allocator = flag ? bitmap->allocator : NULL;
+   _bitmap           = bitmap;
+   _bitmap.allocator = flag ? bitmap.allocator : NULL;
 
 // we don't need to do this, as its just a memset 0
 //   for( i = 0; i < 0x4ß; i++)
@@ -143,7 +144,7 @@ static const struct mulle_allocator    stbi_allocator;
 
    CGBitmapInit( &obj->_bitmap,
                  bytes,
-                 CGBitmapInfoMake( CGBitmapSizeMake( w, h),
+                 CGBitmapInfoMake( MulleIntegerSizeMake( w, h),
                                    0,
                                    CGBitmapEncodingRGBABytes),
                  (struct mulle_allocator *) &stbi_allocator);
@@ -194,7 +195,7 @@ static const struct mulle_allocator    stbi_allocator;
    if( _bitmap.allocator == &stbi_allocator)
       stbi_image_free( _bitmap.bytes);
    else
-      CGBitmapDone( &_bitmap);
+      CGBitmapDone( _bitmap);
 
    [super dealloc];
 }
@@ -229,6 +230,15 @@ static const struct mulle_allocator    stbi_allocator;
    if( _bitmap.info.encoding == CGBitmapEncodingRGBABytes)
       return( _bitmap.bytes);
    return( NULL);
+}
+
+
+- (struct mulle_data) RGBACData
+{
+   if( _bitmap.info.encoding == CGBitmapEncodingRGBABytes)
+      return( mulle_data_make( _bitmap.bytes,
+                               CGBitmapInfoGetAllocationSize( _bitmap.info)));
+   return( mulle_data_make_empty());
 }
 
 
@@ -366,7 +376,7 @@ static const struct mulle_allocator    stbi_allocator;
 
 
 - (CGImage *) cgImageWithContext:(CGContext *) context
-                      imageFlags:(NSUInteger) imageFlags
+                      imageFlags:(NSUInteger) desiredImageFlags
 {
    struct CGBitmapInfo   bitmapInfo;
    NSInteger             imageID;
@@ -374,12 +384,15 @@ static const struct mulle_allocator    stbi_allocator;
    void                  *bytes;
    int                   i;
    int                   j;
+   NSUInteger            imageFlags;
 
    bitmapInfo = _bitmap.info;
 
    //
    // if imageFlags comes in asking for flipped and internal representation
    // is flipped already, then clear, otherwise set for "normal" display
+   //
+   imageFlags = desiredImageFlags;
    if( CGBitmapEncodingIsFlipped( bitmapInfo.encoding))
       imageFlags ^= NVG_IMAGE_FLIPY;
 
@@ -393,7 +406,7 @@ static const struct mulle_allocator    stbi_allocator;
       {
          i     = _imageFlag_index[ j];
          image = mulle__pointermap_get( &_context_map[ i], context);
-         break;
+         return( image);
       }
 
    // create a new cacheable index if possible
@@ -438,21 +451,6 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
-- (NSInteger) nvgImageWithContext:(CGContext *) context
-                        imageFlags:(NSUInteger) imageFlags
-{
-   CGImage   *image;
-
-   image = [self cgImageWithContext:context
-                         imageFlags:imageFlags];
-   if( ! image)
-      return( -1);
-
-   return( [image nvgImageWithContext:context
-                           imageFlags:imageFlags]);
-}
-
-
 - (void) contextDidRemoveObject:(CGContext *) context
 {
    CGImage        *image;
@@ -472,64 +470,18 @@ static const struct mulle_allocator    stbi_allocator;
 }
 
 
-enum
-{
-   NoChange       = 0,
-   GeometryChange = 0x1,
-   StrideChange   = 0x2,
-   EncodingChange = 0x4
-};
 
 
 - (UIBitmapImage *) bitmapImageForBitmapInfo:(struct CGBitmapInfo) convertedBitmapInfo
                                    allocator:(struct mulle_allocator *) allocator
 {
-   struct CGBitmap       convertedBitmap;
-   struct CGBitmapInfo   bitmapInfo;
-   NSUInteger            change;
-   void                  *bytes;
-   NSUInteger            length;
-   NSInteger             y;
+   struct CGBitmap   convertedBitmap;
 
-   bitmapInfo = [self bitmapInfo];
-   change     = NoChange;
-   if( CGBitmapInfoGetEncoding( bitmapInfo) != CGBitmapInfoGetEncoding( convertedBitmapInfo))
-      change |= EncodingChange;
-      // just a geometry change ?
-   if( ! CGBitmapSizeEqualToBitmapSize( bitmapInfo.size, convertedBitmapInfo.size))
-      change |= GeometryChange;
-   if( bitmapInfo.stride != convertedBitmapInfo.stride)
-      change |= StrideChange;
-      // just a stride change
+   if( ! CGBitmapNeedsConversion( _bitmap, convertedBitmapInfo))
+      return( self);
 
-   switch( change)
-   {
-   case NoChange     : return( self);
-   case StrideChange : // just reorganize
-      bytes  = mulle_allocator_malloc( allocator, CGBitmapInfoGetAllocationSize( convertedBitmapInfo));
-      CGBitmapInit( &convertedBitmap, bytes, convertedBitmapInfo, allocator);
-      length = CGBitmapInfoGetLineLength( convertedBitmapInfo);
-      for( y = 0; y < convertedBitmapInfo.size.height; y++)
-      {
-         memcpy( _CGBitmapGetLineBytes( &convertedBitmap, y),
-                 _CGBitmapGetLineBytes( &_bitmap, y),
-                 length);
-      }
-      break;
-
-   default :
-      switch( CGBitmapInitWithBitmapConversion( &convertedBitmap,
-                                                convertedBitmapInfo,
-                                                _bitmap,
-                                                allocator))
-      {
-      case -1 : abort();
-      case 0  : return( self);
-      }
-      break;
-   }
-
-   return( [UIBitmapImage imageWithBitmap:&convertedBitmap
+   convertedBitmap = CGBitmapConvert( _bitmap, convertedBitmapInfo, allocator);
+   return( [UIBitmapImage imageWithBitmap:convertedBitmap
                              freeWhenDone:YES]);
 }
 

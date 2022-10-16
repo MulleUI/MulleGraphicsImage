@@ -12,6 +12,7 @@ endif()
 #
 set( SOURCES
 src/main-animatedgif.m
-src/main-screenshot.m
+src/main-bengal.m
+src/main-tiger.m
 src/main-uiimage.m
 )

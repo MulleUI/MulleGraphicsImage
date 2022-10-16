@@ -9,4 +9,4 @@
  *
  *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
  */
-// no headers
+#import "Ghostscript_Tiger.svg.inc"

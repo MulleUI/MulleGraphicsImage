@@ -8,7 +8,7 @@
 #include <unistd.h>  // for ssize_t
 
 
-enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
+UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 {
    // stb can't do this, because stbi__context is unavailable as are the
    // various test methods
@@ -24,11 +24,15 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
       return( UIImageDataEncodingPNG);
    }
 
+   // https://stackoverflow.com/questions/2253404/what-is-the-smallest-valid-jpeg-file-size-in-bytes
    // https://stackoverflow.com/questions/4550296/how-to-identify-contents-of-a-byte-is-a-jpeg
-   if( data.length > 4)
+   if( data.length >= 32) // BMP min size (assumed)
    {
-
       if( ! strncmp( data.bytes, "<svg", 4))
+         return( UIImageDataEncodingSVG);
+
+      // maybe more effort needed here..
+      if( ! strncmp( data.bytes, "<?xml", 5))
          return( UIImageDataEncodingSVG);
 
       start = data.bytes;
@@ -69,16 +73,16 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 {
    // currently hardcoded: future plugin architecture for subclasses
    // don't have NSNotificationCenter here yet
-   enum UIImageDataEncoding   encoding;
+   UIImageDataEncoding   encoding;
 
    encoding  = UIImageDataEncodingFromCData( data);
    if( encoding == UIImageDataEncodingSVG)
       return( [UISVGImage newWithFileCData:data
-                                sharingObject:sharingObject
-                                     allocator:allocator]);
+                             sharingObject:sharingObject
+                                 allocator:allocator]);
    return( [UIBitmapImage newWithFileCData:data
-                                sharingObject:sharingObject
-                                    allocator:allocator]);
+                             sharingObject:sharingObject
+                                 allocator:allocator]);
 }
 
 
@@ -174,7 +178,7 @@ enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 }
 
 
-- (enum UIImageDataEncoding) fileEncoding
+- (UIImageDataEncoding) fileEncoding
 {
    return( _fileEncoding);
 }

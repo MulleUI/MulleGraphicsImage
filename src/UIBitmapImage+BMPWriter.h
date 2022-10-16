@@ -49,3 +49,10 @@
 - (BOOL) writeToBMPUTF8String:(char *) filename;
 
 @end
+
+
+@interface CGImage( BMPWriter)
+
+- (BOOL) writeToBMPUTF8String:(char *) filename;
+
+@end 

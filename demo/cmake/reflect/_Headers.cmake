@@ -53,6 +53,8 @@ src/include.h
 # contents selected with patternfile ??-header--public-headers
 #
 set( PUBLIC_HEADERS
+src/Ghostscript_Tiger.svg.inc
+src/bengal.jpg.inc
 src/demos-version.h
 src/reflect/_demos-include-public.h
 )

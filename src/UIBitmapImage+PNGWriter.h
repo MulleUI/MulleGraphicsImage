@@ -23,3 +23,9 @@
 
 @end
 
+
+@interface CGImage( PNGWriter)
+
+- (BOOL) writeToPNGUTF8String:(char *) filename;
+
+@end 

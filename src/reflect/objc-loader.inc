@@ -2,6 +2,9 @@
       { @selector( MulleObjCLoader), @selector( MulleCG) },      // 47a9beb6;MulleObjCLoader;d422218a;MulleCG
       { @selector( MulleObjCLoader), @selector( MulleGraphics) },      // 47a9beb6;MulleObjCLoader;d36c3031;MulleGraphics
       { @selector( MulleObjCLoader), @selector( MulleUIBase) },      // 47a9beb6;MulleObjCLoader;3ebba954;MulleUIBase
+      { @selector( CGImage), @selector( BMPWriter) },      // 6ec55940;CGImage;dca12efd;BMPWriter
+      { @selector( CGImage), @selector( GIFWriter) },      // 6ec55940;CGImage;ec7346eb;GIFWriter
+      { @selector( CGImage), @selector( PNGWriter) },      // 6ec55940;CGImage;c9a1cbbc;PNGWriter
       { @selector( CGImage), @selector( UIBitmapImage) },      // 6ec55940;CGImage;839d5bd4;UIBitmapImage
       { @selector( UIAnimatedGIF), MULLE_OBJC_NO_CATEGORYID },      // 8a3a3980;UIAnimatedGIF;;
       { @selector( UIBitmapImage), @selector( BMPWriter) },      // 839d5bd4;UIBitmapImage;dca12efd;BMPWriter

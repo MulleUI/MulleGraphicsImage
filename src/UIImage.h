@@ -1,8 +1,8 @@
 #import "import.h"
 
 
-// currently supported types, not very dynamically expandable (yet)...
-enum UIImageDataEncoding
+   // currently supported types, not very dynamically expandable (yet)...
+typedef NS_ENUM( NSUInteger, UIImageDataEncoding)
 {
    UIImageDataEncodingUnknown = 0,
    UIImageDataEncodingRGBA,    // unwrapped and uncompressed
@@ -29,7 +29,7 @@ enum UIImageDataEncoding
    id                         _fileDataSharingObject;
    struct mulle_data          _fileData;
    struct mulle_allocator     *_fileDataAllocator;
-   enum UIImageDataEncoding   _fileEncoding;
+   UIImageDataEncoding        _fileEncoding;
 }
 
 + (instancetype) imageWithContentsOfFileCString:(char *) s;
@@ -60,7 +60,7 @@ enum UIImageDataEncoding
 // data can be shared w/o a problem. The default is 0:
 //
 
-- (enum UIImageDataEncoding) fileEncoding;
+- (UIImageDataEncoding) fileEncoding;
 
 @end
 
@@ -72,4 +72,4 @@ enum UIImageDataEncoding
 @end
 
 
-enum UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data);
+UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data);

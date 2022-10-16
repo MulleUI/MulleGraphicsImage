@@ -72,12 +72,13 @@
 //   '---------'              '------------'
 //
 //
-// UIBitmapImage should be for all intents and purposes be immutable.
+// UIBitmapImage should, for all intents and purposes, be immutable.
 // If you want mutability, use a subclass (and block copying and
 // sharing methods)
 //
 // UIBitmapImage can be used by multiple contexts, it will create
 // a CGTextureImage on demand.
+// TODO: need a lock for context_map and imageFlag
 //
 #define UIBitmapImageNumberOfContextMappings  4
 
@@ -98,11 +99,11 @@
 }
 
 
-// Pass in a bitmap and if freeWhenDone is set, then the allocator of the
+// Pass in a bitmap and if freeWhenDone is set to NO, then the allocator of the
 // UIBitmapImage is set to NULL, which will keep the bitmap intact. If the
-// bitmap has no allocator, freeWhenDone=YES will not do anything also.
+// bitmap has no allocator, freeWhenDone=YES will assert.
 //
-+ (instancetype) imageWithBitmap:(struct CGBitmap *) bitmap
++ (instancetype) imageWithBitmap:(struct CGBitmap) bitmap
                     freeWhenDone:(BOOL) flag;
 
 // if allocator is NULL, then no free on release
@@ -110,24 +111,20 @@
                      bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                       allocator:(struct mulle_allocator *) allocator;
 
++ (instancetype) newWithFileCData:(struct mulle_data) data
+                    sharingObject:(id) sharingObject
+                        allocator:(struct mulle_allocator *) allocator;
 
-- (instancetype) initWithBitmap:(struct CGBitmap *) bitmap
-                    freeWhenDone:(BOOL) flag;
+- (instancetype) initWithBitmap:(struct CGBitmap) bitmap
+                   freeWhenDone:(BOOL) flag;
 
 // if allocator is NULL, then no free on release
 - (instancetype) initWithBytes:(void *) bytes
                     bitmapInfo:(struct CGBitmapInfo) bitmapInfo
                      allocator:(struct mulle_allocator *) allocator;
 
-+ (instancetype) newWithFileCData:(struct mulle_data) data
-                    sharingObject:(id) sharingObject
-                        allocator:(struct mulle_allocator *) allocator;
-
 - (CGImage *) cgImageWithContext:(CGContext *) context
                       imageFlags:(NSUInteger) imageFlags;
-
-- (NSInteger) nvgImageWithContext:(CGContext *) context
-                       imageFlags:(NSUInteger) imageFlags;
 
 - (struct CGBitmapInfo) bitmapInfo;
 - (struct mulle_allocator *)  bitmapAllocator;
@@ -135,6 +132,10 @@
 
 // will return NULL if bitmap is not in RGBA format
 - (void *) RGBABytes;
+
+// will have length zero if no RGBA format available
+- (struct mulle_data) RGBACData;
+
 
 // vertically flipped that is
 - (UIBitmapImage *) flippedBitmapImageWithAllocator:(struct mulle_allocator *) allocator;
