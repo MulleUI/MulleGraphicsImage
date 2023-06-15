@@ -934,7 +934,7 @@ static BOOL GifEnd( struct UIGIFWriter* writer )
 
 + (instancetype) animatedGIFWithUTF8String:(char *) filename
                             bitmapSize:(struct MulleIntegerSize) bitmapSize
-                             frameRate:(CGFloat) frameRate
+                             frameRate:(mulle_relativetime_t) frameRate
                                   loop:(BOOL) loop
 {
    return( [[[self alloc] initWithUTF8String:filename
@@ -946,7 +946,7 @@ static BOOL GifEnd( struct UIGIFWriter* writer )
 
 - (instancetype) initWithUTF8String:(char *) filename
                          bitmapSize:(struct MulleIntegerSize) bitmapSize
-                          frameRate:(CGFloat) frameRate
+                          frameRate:(mulle_relativetime_t) frameRate
                               loop:(BOOL) loop
 {
    // TODO: conceivably should convert to FileSystemRepresentation
@@ -1034,7 +1034,6 @@ static BOOL GifEnd( struct UIGIFWriter* writer )
 - (BOOL) writeToAnimatedGIF:(UIAnimatedGIF *) gif
 {
    struct CGBitmapInfo   gifInfo;
-   struct MulleIntegerSize   bitmapSize;
    BOOL                  rval;
    UIBitmapImage         *image;
 
@@ -1050,10 +1049,9 @@ static BOOL GifEnd( struct UIGIFWriter* writer )
 
 - (BOOL) writeToGIFUTF8String:(char *) filename
 {
-   UIAnimatedGIF         *gif;
-   struct CGBitmapInfo    gifInfo;
+   UIAnimatedGIF              *gif;
    struct MulleIntegerSize    bitmapSize;
-   BOOL                   rval;
+   BOOL                       rval;
 
    bitmapSize = [self bitmapSize];
    gif        = [UIAnimatedGIF animatedGIFWithUTF8String:filename

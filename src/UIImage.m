@@ -8,64 +8,182 @@
 #include <unistd.h>  // for ssize_t
 
 
-UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
+static UIImageDataEncoding  png_detector( struct mulle_data data)
 {
-   // stb can't do this, because stbi__context is unavailable as are the
-   // various test methods
-
    // https://en.wikipedia.org/wiki/Portable_Network_Graphics
    static uint8_t   png_header[] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0xA };
-   uint8_t          *start;
-   uint8_t          *end;
 
    if( data.length > sizeof( png_header) &&
       ! memcmp( data.bytes, png_header, sizeof( png_header)))
    {
       return( UIImageDataEncodingPNG);
    }
-
-   // https://stackoverflow.com/questions/2253404/what-is-the-smallest-valid-jpeg-file-size-in-bytes
-   // https://stackoverflow.com/questions/4550296/how-to-identify-contents-of-a-byte-is-a-jpeg
-   if( data.length >= 32) // BMP min size (assumed)
-   {
-      if( ! strncmp( data.bytes, "<svg", 4))
-         return( UIImageDataEncodingSVG);
-
-      // maybe more effort needed here..
-      if( ! strncmp( data.bytes, "<?xml", 5))
-         return( UIImageDataEncodingSVG);
-
-      start = data.bytes;
-      end   = &start[ data.length];
-      if( start[ 0] == 0xFF && start[ 1] == 0xD8 &&
-          end[ -2] == 0xFF && end[ -1] == 0xD9)
-      {
-         return( UIImageDataEncodingJPG);
-      }
-
-      if( start[ 0] == 'B' && start[ 1] == 'M')
-         return( UIImageDataEncodingBMP);
-   }
-
    return( UIImageDataEncodingUnknown);
 }
 
 
-
-
-@implementation UIImage( CGImageLayer)
-
-#pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
-
-- (Class) preferredLayerClass
+static UIImageDataEncoding   svg_detector( struct mulle_data data)
 {
-	return( [CAImageLayer class]);
+   if( data.length >= 40)
+   {
+      if( ! strncmp( data.bytes, "<svg", 4))
+         return( UIImageDataEncodingSVG);
+   }
+   return( UIImageDataEncodingUnknown);
 }
 
-@end
+static UIImageDataEncoding   jpg_detector( struct mulle_data data)
+{
+   uint8_t          *start;
+   uint8_t          *end;
+
+   start = data.bytes;
+   end   = &start[ data.length];
+
+   if( data.length >= 100)
+   {
+      if( start[ 0] == 0xFF && start[ 1] == 0xD8 &&
+            end[ -2] == 0xFF && end[ -1] == 0xD9)
+      {
+         return( UIImageDataEncodingJPG);
+      }
+   }
+   return( UIImageDataEncodingUnknown);
+}
+
+static UIImageDataEncoding   bmp_detector( struct mulle_data data)
+{
+   uint8_t   *start;
+
+   start = data.bytes;
+
+   if( data.length >= 32)
+   {
+      if( start[ 0] == 'B' && start[ 1] == 'M')
+         return( UIImageDataEncodingBMP);
+   }
+   return( UIImageDataEncodingUnknown);
+}
+
+
+#pragma clang diagnostic ignored "-Wprotocol"
 
 
 @implementation UIImage
+
+struct decoder_entry
+{
+   UIImageDataDetector   *detector;  // function pointer, so wrap in struct for oneriness
+};
+
+
+static struct
+{
+   struct mulle__structarray  _detectors;
+   struct mulle__pointermap   _encodingMap;
+} Self ;
+
+
++ (void) load
+{
+   struct mulle_allocator  *allocator;
+   struct decoder_entry    entry;
+
+   allocator = MulleObjCClassGetAllocator( self);
+
+   _mulle__structarray_init( &Self._detectors,
+                             sizeof( struct decoder_entry),
+                             alignof( struct decoder_entry),
+                             16,
+                             allocator);
+   _mulle__pointermap_init( &Self._encodingMap,
+                            16,
+                            allocator);
+
+   entry.detector = png_detector;
+   _mulle__structarray_add( &Self._detectors, &entry, allocator);
+   entry.detector = svg_detector;
+   _mulle__structarray_add( &Self._detectors, &entry, allocator);
+   entry.detector = jpg_detector;
+   _mulle__structarray_add( &Self._detectors, &entry, allocator);
+   entry.detector = bmp_detector;
+   _mulle__structarray_add( &Self._detectors, &entry, allocator);
+}
+
+
++ (void) unload
+{
+   struct mulle_allocator  *allocator;
+
+   allocator = MulleObjCClassGetAllocator( self);
+
+   _mulle__structarray_done( &Self._detectors, allocator);
+   _mulle__pointermap_done( &Self._encodingMap, allocator);
+}
+
+
++ (void) addImageDataDetector:(UIImageDataDetector) detector
+{
+   struct decoder_entry     entry;
+   struct mulle_allocator   *allocator;
+
+   if( ! detector)
+      return;
+
+   allocator = MulleObjCInstanceGetAllocator( self);
+   entry.detector = detector;
+   _mulle__structarray_add( &Self._detectors, &entry, allocator);
+}
+
+
+UIImageDataEncoding   UIImageDataEncodingFromCData( struct mulle_data data)
+{
+   struct decoder_entry  *entry;
+   UIImageDataEncoding   encoding;
+
+   encoding = UIImageDataEncodingUnknown;
+   mulle__structarray_for( &Self._detectors, entry)
+   {
+      encoding = (*entry->detector)( data);
+      if( encoding != UIImageDataEncodingUnknown)
+         break;
+   }
+   return( encoding);
+}
+
+
+
++ (void) registerClass:(Class) cls
+        forDataEncoding:(UIImageDataEncoding) encoding
+{
+   struct mulle_allocator   *allocator;
+
+   allocator = MulleObjCInstanceGetAllocator( self);
+   mulle__pointermap_set( &Self._encodingMap,
+                          (void *) encoding,
+                          cls,
+                          allocator);
+}
+
+
++ (Class) classForDataEncoding:(UIImageDataEncoding) encoding
+{
+   Class    cls;
+
+   cls = mulle__pointermap_get( &Self._encodingMap, (void *) encoding);
+   if( cls)
+      return( cls);
+
+   switch( encoding)
+   {
+   case UIImageDataEncodingBMP :
+   case UIImageDataEncodingJPG :
+   case UIImageDataEncodingPNG : return( [UIBitmapImage class]);
+   case UIImageDataEncodingSVG : return( [UISVGImage class]);
+   default                     : return( nil);
+   }
+}
+
 
 - (instancetype) initWithFileCData:(struct mulle_data) data
                      sharingObject:(id) sharingObject
@@ -74,15 +192,21 @@ UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
    // currently hardcoded: future plugin architecture for subclasses
    // don't have NSNotificationCenter here yet
    UIImageDataEncoding   encoding;
+   Class                 cls;
 
-   encoding  = UIImageDataEncodingFromCData( data);
-   if( encoding == UIImageDataEncodingSVG)
-      return( [UISVGImage newWithFileCData:data
-                             sharingObject:sharingObject
-                                 allocator:allocator]);
-   return( [UIBitmapImage newWithFileCData:data
-                             sharingObject:sharingObject
-                                 allocator:allocator]);
+   encoding = UIImageDataEncodingFromCData( data);
+   if( encoding == UIImageDataEncodingUnknown)
+   {
+      fprintf( stderr, "Can't figure out data format for image\n");
+      [self release];
+      return( nil);
+   }
+
+   cls = [[self class] classForDataEncoding:encoding];
+   // TODO: rename to UIVectorImage
+   return( [cls newWithFileCData:data
+                   sharingObject:sharingObject
+                       allocator:allocator]);
 }
 
 
@@ -181,6 +305,18 @@ UIImageDataEncoding   UIImageDataEncodingFromCData(struct mulle_data data)
 - (UIImageDataEncoding) fileEncoding
 {
    return( _fileEncoding);
+}
+
+@end
+
+
+#pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
+
+@implementation UIImage( CGImageLayer)
+
+- (Class) preferredLayerClass
+{
+   return( [CAImageLayer class]);
 }
 
 @end

@@ -166,15 +166,13 @@ static CGDrawableOptions  defaultOptions =
           options:(CGDrawableOptions *) options
           context:(CGContext *) context
 {
+   CGAffineTransform   xform;
+   CGColor             color;
    float               *p;
+   int                 i;
    NSVGpath            *path;
    NSVGshape           *shape;
-   CGColor             color;
-   CGPoint             scale;
-   CGRect              rect;
-   int                 i;
    NVGcontext          *vg;
-   CGAffineTransform   xform;
 
    if( ! options)
       options = &defaultOptions;

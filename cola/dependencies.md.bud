@@ -1,0 +1,9 @@
+## Dependencies 
+
+### Debian
+
+```
+apt-get install libbz2-dev
+```
+
+

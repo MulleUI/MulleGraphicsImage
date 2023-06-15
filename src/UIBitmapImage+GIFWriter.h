@@ -68,18 +68,18 @@ struct UIGIFWriter
 }
 
 @property( assign) struct MulleIntegerSize    bitmapSize;
-@property( assign) CGFloat                    frameRate;
+@property( assign) mulle_relativetime_t       frameRate;
 // @property( assign) NSUInteger                 bitDepth; // fixed to 8
 @property( assign, getter=isDithering) BOOL   dithering;
 
 + (instancetype) animatedGIFWithUTF8String:(char *) filename
                                 bitmapSize:(struct MulleIntegerSize) bitmapSize
-                                 frameRate:(CGFloat) frameRate
+                                 frameRate:(mulle_relativetime_t) frameRate
                                       loop:(BOOL) loop;
 
 - (instancetype) initWithUTF8String:(char *) filename
                          bitmapSize:(struct MulleIntegerSize) bitmapSize
-                          frameRate:(CGFloat) frameRate
+                          frameRate:(mulle_relativetime_t) frameRate
                                loop:(BOOL) loop;
 - (BOOL) writeBytes:(void *) bytes;
 - (BOOL) close;

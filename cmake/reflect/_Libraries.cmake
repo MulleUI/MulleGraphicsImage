@@ -15,9 +15,12 @@ endif()
 # Generated from sourcetree: 88F6D64A-1612-432A-AB72-08E0ED42D9C0;z;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;
 # Disable with : `mulle-sourcetree mark z `
 # Disable for this platform: `mulle-sourcetree mark z no-cmake-platform-${MULLE_UNAME}`
+# Disable for a sdk: `mulle-sourcetree mark z no-cmake-sdk-<name>`
 #
 if( NOT Z_LIBRARY)
-   find_library( Z_LIBRARY NAMES z)
+   find_library( Z_LIBRARY NAMES
+      z
+   )
    message( STATUS "Z_LIBRARY is ${Z_LIBRARY}")
    #
    # The order looks ascending, but due to the way this file is read
@@ -28,11 +31,7 @@ if( NOT Z_LIBRARY)
       # Add Z_LIBRARY to OS_SPECIFIC_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark z no-cmake-add`
       #
-      set( OS_SPECIFIC_LIBRARIES
-         ${OS_SPECIFIC_LIBRARIES}
-         ${Z_LIBRARY}
-         CACHE INTERNAL "need to cache this"
-      )
+      list( APPEND OS_SPECIFIC_LIBRARIES ${Z_LIBRARY})
       # intentionally left blank
    else()
       # Disable with: `mulle-sourcetree mark z no-require-link`
@@ -45,9 +44,12 @@ endif()
 # Generated from sourcetree: 1012BD39-CB3B-4C0E-B5DB-030118C4059E;bz2;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;
 # Disable with : `mulle-sourcetree mark bz2 `
 # Disable for this platform: `mulle-sourcetree mark bz2 no-cmake-platform-${MULLE_UNAME}`
+# Disable for a sdk: `mulle-sourcetree mark bz2 no-cmake-sdk-<name>`
 #
 if( NOT BZ2_LIBRARY)
-   find_library( BZ2_LIBRARY NAMES bz2)
+   find_library( BZ2_LIBRARY NAMES
+      bz2
+   )
    message( STATUS "BZ2_LIBRARY is ${BZ2_LIBRARY}")
    #
    # The order looks ascending, but due to the way this file is read
@@ -58,11 +60,7 @@ if( NOT BZ2_LIBRARY)
       # Add BZ2_LIBRARY to OS_SPECIFIC_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark bz2 no-cmake-add`
       #
-      set( OS_SPECIFIC_LIBRARIES
-         ${OS_SPECIFIC_LIBRARIES}
-         ${BZ2_LIBRARY}
-         CACHE INTERNAL "need to cache this"
-      )
+      list( APPEND OS_SPECIFIC_LIBRARIES ${BZ2_LIBRARY})
       # intentionally left blank
    else()
       # Disable with: `mulle-sourcetree mark bz2 no-require-link`
@@ -75,9 +73,12 @@ endif()
 # Generated from sourcetree: 02BCFB45-5ACD-4DBF-B1C3-7BFE405953C4;png;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;
 # Disable with : `mulle-sourcetree mark png `
 # Disable for this platform: `mulle-sourcetree mark png no-cmake-platform-${MULLE_UNAME}`
+# Disable for a sdk: `mulle-sourcetree mark png no-cmake-sdk-<name>`
 #
 if( NOT PNG_LIBRARY)
-   find_library( PNG_LIBRARY NAMES png)
+   find_library( PNG_LIBRARY NAMES
+      png
+   )
    message( STATUS "PNG_LIBRARY is ${PNG_LIBRARY}")
    #
    # The order looks ascending, but due to the way this file is read
@@ -88,11 +89,7 @@ if( NOT PNG_LIBRARY)
       # Add PNG_LIBRARY to OS_SPECIFIC_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark png no-cmake-add`
       #
-      set( OS_SPECIFIC_LIBRARIES
-         ${OS_SPECIFIC_LIBRARIES}
-         ${PNG_LIBRARY}
-         CACHE INTERNAL "need to cache this"
-      )
+      list( APPEND OS_SPECIFIC_LIBRARIES ${PNG_LIBRARY})
       # intentionally left blank
    else()
       # Disable with: `mulle-sourcetree mark png no-require-link`

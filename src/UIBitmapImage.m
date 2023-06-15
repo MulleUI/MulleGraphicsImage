@@ -311,7 +311,6 @@ static const struct mulle_allocator    stbi_allocator;
 - (BOOL) _isFullyTransparentRGBABytes
 {
    struct CGBitmapInfo   bitmapInfo;
-   NSInteger             line_length;
    uint8_t               *src;
    uint8_t               *p;
    NSUInteger            x;
@@ -338,7 +337,6 @@ static const struct mulle_allocator    stbi_allocator;
 - (BOOL) _isFullyTransparentRGBAFloats
 {
    struct CGBitmapInfo   bitmapInfo;
-   NSInteger             line_length;
    float                 *src;
    float                 *p;
    NSUInteger            x;
@@ -379,7 +377,6 @@ static const struct mulle_allocator    stbi_allocator;
                       imageFlags:(NSUInteger) desiredImageFlags
 {
    struct CGBitmapInfo   bitmapInfo;
-   NSInteger             imageID;
    CGImage               *image;
    void                  *bytes;
    int                   i;
@@ -425,9 +422,9 @@ static const struct mulle_allocator    stbi_allocator;
       case CGBitmapEncodingRGBABytes :
       case CGBitmapEncodingFlipYRGBABytes :
          image = [[CGImage alloc] initWithRGBABytes:bytes
-                                         bitmapSize:bitmapInfo.size
-                                         imageFlags:imageFlags
-                                            context:context];
+                                          bitmapSize:bitmapInfo.size
+                                          imageFlags:imageFlags
+                                             context:context];
       default :
          break;
       }
@@ -441,11 +438,12 @@ static const struct mulle_allocator    stbi_allocator;
                                 context,
                                 image,
                                 MulleObjCInstanceGetAllocator( self));
-
          // we add ourselves to the resources to remove
          // that way we can remove the image from the context map
-         [context addToResources:self];
+         // [context addToResources:self];
       }
+      else
+         image = [image autorelease];
    }
    return( image);
 }
@@ -468,8 +466,6 @@ static const struct mulle_allocator    stbi_allocator;
       }
    }
 }
-
-
 
 
 - (UIBitmapImage *) bitmapImageForBitmapInfo:(struct CGBitmapInfo) convertedBitmapInfo

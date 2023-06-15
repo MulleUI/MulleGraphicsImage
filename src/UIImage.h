@@ -1,16 +1,50 @@
 #import "import.h"
 
 
-   // currently supported types, not very dynamically expandable (yet)...
+#define UIImageDataEncodingVector  0x80
+
+#define mulle_multichar_constant2( a, b)  \
+   (((uint32_t) (a) << 8) | (uint32_t) (b))
+
+#define mulle_multichar_constant3( a, b, c)                          \
+     mulle_multichar_constant2( mulle_multichar_constant2( a, b), c)
+
+#define mulle_multichar_constant4( a, b, c, d)                    \
+    mulle_multichar_constant2( mulle_multichar_constant2( a, b),  \
+                               mulle_multichar_constant2( c, d))
+
+#define ui_bitmap_encoding3( a, b, c)   \
+    mulle_multichar_constant3( a, b, c)
+
+#define ui_vector_encoding3( a, b, c)   \
+    mulle_multichar_constant3( a, b, (c) | UIImageDataEncodingVector)
+
+
 typedef NS_ENUM( NSUInteger, UIImageDataEncoding)
 {
    UIImageDataEncodingUnknown = 0,
-   UIImageDataEncodingRGBA,    // unwrapped and uncompressed
-   UIImageDataEncodingPNG,
-   UIImageDataEncodingJPG,
-   UIImageDataEncodingBMP,
-   UIImageDataEncodingSVG
+   UIImageDataEncodingRGBA = ui_bitmap_encoding3( 'R', 'G', 'B'),    // unwrapped and uncompressed
+   UIImageDataEncodingPNG  = ui_bitmap_encoding3( 'P', 'N', 'G'),
+   UIImageDataEncodingJPG  = ui_bitmap_encoding3( 'J', 'P', 'G'),
+   UIImageDataEncodingBMP  = ui_bitmap_encoding3( 'B', 'M', 'P'),
+
+   UIImageDataEncodingSVG  = ui_vector_encoding3( 'S', 'V', 'G')
 };
+
+
+static inline int   UIImageDataEncodingIsBitmapFormat( UIImageDataEncoding encoding)
+{
+   return( ! (encoding & UIImageDataEncodingVector));
+}
+
+
+static inline int   UIImageDataEncodingIsVectorFormat( UIImageDataEncoding encoding)
+{
+   return( encoding & UIImageDataEncodingVector);
+}
+
+
+typedef UIImageDataEncoding   UIImageDataDetector( struct mulle_data data);
 
 //
 // An UIImage is an image loaded from a file or intended to be written into
@@ -26,10 +60,10 @@ typedef NS_ENUM( NSUInteger, UIImageDataEncoding)
 //
 @interface UIImage : NSObject < CGDrawable, MulleObjCClassCluster>
 {
-   id                         _fileDataSharingObject;
-   struct mulle_data          _fileData;
-   struct mulle_allocator     *_fileDataAllocator;
-   UIImageDataEncoding        _fileEncoding;
+   id                       _fileDataSharingObject;
+   struct mulle_data        _fileData;
+   struct mulle_allocator   *_fileDataAllocator;
+   UIImageDataEncoding      _fileEncoding;
 }
 
 + (instancetype) imageWithContentsOfFileCString:(char *) s;
@@ -50,6 +84,8 @@ typedef NS_ENUM( NSUInteger, UIImageDataEncoding)
 - (instancetype) initWithFileCData:(struct mulle_data) data
                      sharingObject:(id) sharingObject;
 
+
++ (void) addImageDataDetector:(UIImageDataDetector) detector;
 
 //
 // Textures (images) in NVG can be created with different flags, for example

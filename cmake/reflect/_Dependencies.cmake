@@ -15,9 +15,23 @@ endif()
 # Generated from sourcetree: BE03CBCA-C69F-4FCD-AFC5-69A20255D4EE;MulleGraphics;no-singlephase;
 # Disable with : `mulle-sourcetree mark MulleGraphics no-link`
 # Disable for this platform: `mulle-sourcetree mark MulleGraphics no-cmake-platform-${MULLE_UNAME}`
+# Disable for a sdk: `mulle-sourcetree mark MulleGraphics no-cmake-sdk-<name>`
 #
 if( NOT MULLE_GRAPHICS_LIBRARY)
-   find_library( MULLE_GRAPHICS_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX} ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_STATIC_LIBRARY_SUFFIX} MulleGraphics NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
+   if( DEPENDENCY_IGNORE_SYSTEM_LIBARIES)
+      find_library( MULLE_GRAPHICS_LIBRARY NAMES
+         ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+         ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_STATIC_LIBRARY_SUFFIX}
+         MulleGraphics
+         NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH
+      )
+   else()
+      find_library( MULLE_GRAPHICS_LIBRARY NAMES
+         ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+         ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_STATIC_LIBRARY_SUFFIX}
+         MulleGraphics
+      )
+   endif()
    message( STATUS "MULLE_GRAPHICS_LIBRARY is ${MULLE_GRAPHICS_LIBRARY}")
    #
    # The order looks ascending, but due to the way this file is read
@@ -28,11 +42,7 @@ if( NOT MULLE_GRAPHICS_LIBRARY)
       # Add MULLE_GRAPHICS_LIBRARY to ALL_LOAD_DEPENDENCY_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark MulleGraphics no-cmake-add`
       #
-      set( ALL_LOAD_DEPENDENCY_LIBRARIES
-         ${ALL_LOAD_DEPENDENCY_LIBRARIES}
-         ${MULLE_GRAPHICS_LIBRARY}
-         CACHE INTERNAL "need to cache this"
-      )
+      list( APPEND ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE_GRAPHICS_LIBRARY})
       #
       # Inherit information from dependency.
       # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
@@ -43,28 +53,25 @@ if( NOT MULLE_GRAPHICS_LIBRARY)
       get_filename_component( _TMP_MULLE_GRAPHICS_ROOT "${_TMP_MULLE_GRAPHICS_ROOT}" DIRECTORY)
       #
       #
-      # Search for "DependenciesAndLibraries.cmake" to include.
+      # Search for "Definitions.cmake" and "DependenciesAndLibraries.cmake" to include.
       # Disable with: `mulle-sourcetree mark MulleGraphics no-cmake-dependency`
       #
       foreach( _TMP_MULLE_GRAPHICS_NAME "MulleGraphics")
          set( _TMP_MULLE_GRAPHICS_DIR "${_TMP_MULLE_GRAPHICS_ROOT}/include/${_TMP_MULLE_GRAPHICS_NAME}/cmake")
          # use explicit path to avoid "surprises"
-         if( EXISTS "${_TMP_MULLE_GRAPHICS_DIR}/DependenciesAndLibraries.cmake")
-            unset( MULLE_GRAPHICS_DEFINITIONS)
+         if( IS_DIRECTORY "${_TMP_MULLE_GRAPHICS_DIR}")
             list( INSERT CMAKE_MODULE_PATH 0 "${_TMP_MULLE_GRAPHICS_DIR}")
             #
-            include( "${_TMP_MULLE_GRAPHICS_DIR}/DependenciesAndLibraries.cmake")
-            #
+            include( "${_TMP_MULLE_GRAPHICS_DIR}/DependenciesAndLibraries.cmake" OPTIONAL)
             #
             list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_GRAPHICS_DIR}")
-            set( INHERITED_DEFINITIONS
-               ${INHERITED_DEFINITIONS}
-               ${MULLE_GRAPHICS_DEFINITIONS}
-               CACHE INTERNAL "need to cache this"
-            )
+            #
+            unset( MULLE_GRAPHICS_DEFINITIONS)
+            include( "${_TMP_MULLE_GRAPHICS_DIR}/Definitions.cmake" OPTIONAL)
+            list( APPEND INHERITED_DEFINITIONS ${MULLE_GRAPHICS_DEFINITIONS})
             break()
          else()
-            message( STATUS "${_TMP_MULLE_GRAPHICS_DIR}/DependenciesAndLibraries.cmake not found")
+            message( STATUS "${_TMP_MULLE_GRAPHICS_DIR} not found")
          endif()
       endforeach()
       #
@@ -75,11 +82,7 @@ if( NOT MULLE_GRAPHICS_LIBRARY)
          foreach( _TMP_MULLE_GRAPHICS_NAME "MulleGraphics")
             set( _TMP_MULLE_GRAPHICS_FILE "${_TMP_MULLE_GRAPHICS_ROOT}/include/${_TMP_MULLE_GRAPHICS_NAME}/MulleObjCLoader+${_TMP_MULLE_GRAPHICS_NAME}.h")
             if( EXISTS "${_TMP_MULLE_GRAPHICS_FILE}")
-               set( INHERITED_OBJC_LOADERS
-                  ${INHERITED_OBJC_LOADERS}
-                  ${_TMP_MULLE_GRAPHICS_FILE}
-                  CACHE INTERNAL "need to cache this"
-               )
+               list( APPEND INHERITED_OBJC_LOADERS ${_TMP_MULLE_GRAPHICS_FILE})
                break()
             endif()
          endforeach()
