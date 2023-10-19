@@ -1,6 +1,11 @@
 #import "import.h"
 
 
+//
+// TODO: split into UIImage + UIOSImage which ties MulleCG into it. That
+//       way UIImage can be used to read/write files without the need for
+//       a CGContext
+//
 #define UIImageDataEncodingVector  0x80
 
 #define mulle_multichar_constant2( a, b)  \
@@ -86,15 +91,6 @@ typedef UIImageDataEncoding   UIImageDataDetector( struct mulle_data data);
 
 
 + (void) addImageDataDetector:(UIImageDataDetector) detector;
-
-//
-// Textures (images) in NVG can be created with different flags, for example
-// REPEAT_X andREPEAT_Y. When we are asking the CGContext for a imageID
-// for an image this will create such a NVG texture. As the context cashes the
-// imageID for each UIImage it's simplest to store the imageFlags here
-// (readonly) and to clone UIImages for different flags. The actual image
-// data can be shared w/o a problem. The default is 0:
-//
 
 - (UIImageDataEncoding) fileEncoding;
 

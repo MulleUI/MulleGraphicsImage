@@ -91,7 +91,7 @@
    // different CGImage. Each CGImage is only valid in its own CGContext.
    //
    // We assume combinations are pretty much the same always, so we only
-   // cache a few different imageFlags combination for each context.
+   // cache a few different textureFlags combination for each context.
    //
    int                        _n_imageFlag_index;
    int                        _imageFlag_index[ UIBitmapImageNumberOfContextMappings];
@@ -124,7 +124,7 @@
                      allocator:(struct mulle_allocator *) allocator;
 
 - (CGImage *) cgImageWithContext:(CGContext *) context
-                      imageFlags:(NSUInteger) imageFlags;
+                    textureFlags:(NSUInteger) textureFlags;
 
 - (struct CGBitmapInfo) bitmapInfo;
 - (struct mulle_allocator *)  bitmapAllocator;

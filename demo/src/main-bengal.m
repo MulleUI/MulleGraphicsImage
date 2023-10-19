@@ -52,7 +52,7 @@ static UIWindow  *create_window( UIImage *tigerBitmap)
    [scroller setZoomEnabled:YES];
    [scroller setContentSize:[imageView frame].size];
    [[scroller contentView] addSubview:imageView];
-   [[window contentPlane] addSubview:scroller];
+   [[window contentView] addSubview:scroller];
 
    return( window);
 }

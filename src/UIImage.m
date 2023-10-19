@@ -24,10 +24,22 @@ static UIImageDataEncoding  png_detector( struct mulle_data data)
 
 static UIImageDataEncoding   svg_detector( struct mulle_data data)
 {
+   struct mulle_data    header;
+   void                 *found;
+
    if( data.length >= 40)
    {
       if( ! strncmp( data.bytes, "<svg", 4))
          return( UIImageDataEncodingSVG);
+
+      if( ! strncmp( data.bytes, "<?xml", 5))
+      {
+         header = mulle_data_subdata( data,
+                                      mulle_range_make( 0, data.length > 512 ? 512 : data.length));
+         found  = mulle_data_search_data( header, mulle_data_make( "<svg", 4));
+         if( found)
+            return( UIImageDataEncodingSVG);
+      }
    }
    return( UIImageDataEncodingUnknown);
 }

@@ -40,20 +40,13 @@ static UIWindow  *create_window( void)
 
    // BUTTON IN SCROLLVIEW
 
-   tigerImage = [[[UIImage alloc] initWithFileCData:mulle_data_make( tiger_data, s_tiger_data)
-                                          allocator:NULL] autorelease];
+   tigerImage = [UIImage imageWithFileCData:mulle_data_make( tiger_data, s_tiger_data)
+                                  allocator:NULL];
    if( ! tigerImage)
-   {
-      fprintf( stderr,
-"------------------------------------------------------------------\n"
-"This Demo needs the following file to be in the current directory \n"
-"\"Ghostscript_Tiger.svg\"\n."
-"------------------------------------------------------------------\n");
       abort();
-   }
 
-   imageLayer = [[[CAImageLayer alloc] initWithImage:tigerImage] autorelease];
-   imageView  = [[[UIImageView alloc] initWithLayer:imageLayer] autorelease];
+   imageLayer = [CAImageLayer layerWithImage:tigerImage];
+   imageView  = [UIImageView viewWithLayer:imageLayer];
 
    fprintf( stderr, "view: %p f=[%s] c=[%s]\n", 
                         imageView, 
@@ -67,13 +60,13 @@ static UIWindow  *create_window( void)
 
    // SCROLLVIEW
    frame    = CGRectInset( windowFrame, 20.0, 20.0);
-   scroller = [[[UIScrollView alloc] initWithFrame:frame] autorelease];
+   scroller = [UIScrollView viewWithFrame:frame];
    [scroller setMargins:UIEdgeInsetsMake( 20.0, 20.0, 20.0, 20.0)];
-   [scroller setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+   [scroller setAutoresizingMask:UIViewAutoresizingScaleToFill];
    [scroller setZoomEnabled:YES];
    [scroller setContentSize:[imageView frame].size];
    [[scroller contentView] addSubview:imageView];
-   [[window contentPlane] addSubview:scroller];
+   [[window contentView] addSubview:scroller];
 
    [window dump];
    return( window);

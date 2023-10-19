@@ -156,10 +156,17 @@ static const struct mulle_allocator   nsvgAllocator;
 }
 
 
-static CGDrawableOptions  defaultOptions =
-{
-   0.0f, 1.0f, 0.0f, NO
-};
+//static CGDrawableOptions  defaultOptions =
+//{
+//   .alpha             = 1.0f,
+//   .cornerInsets      = (MulleCornerInsets) { 0.0f, 0.0f, 0.0f, 0.0f },
+//   .rotation          = CGRotationNone,
+//   .scale             = CGScaleNone,
+//   .flags.flip        = CGFlipNone,
+//   .flags.repeat      = CGRepeatAsIs,
+//   .flags.contentMode = CGContentModeCenterPoint
+//};
+//
 
 
 - (void) drawRect:(CGRect) rect
@@ -175,10 +182,9 @@ static CGDrawableOptions  defaultOptions =
    NVGcontext          *vg;
 
    if( ! options)
-      options = &defaultOptions;
+      options = &CGDrawableOptionsDefault;
 
-
-   assert( options->cornerRadius == 0.0);  // we can't do this for vector
+   assert( options->cornerInsets.topLeft == 0.0);  // we can't do this for vector
    assert( options->scale == NO);          // we too lazy to do this for vector
    assert( options->rotation == 0.0);      // we too lazy to do this for vector
 
@@ -199,11 +205,11 @@ static CGDrawableOptions  defaultOptions =
          nvgStrokeWidth( vg, shape->strokeWidth);
 
          color = getSVGColor( shape->fill.color);
-         color = CGColorByMultiplyingAlpha( color, options->alpha);
+         color = CGColorMultiplyAlpha( color, options->alpha);
          nvgFillColor( vg, color);
 
          color = getSVGColor( shape->stroke.color);
-         color = CGColorByMultiplyingAlpha( color, options->alpha);
+         color = CGColorMultiplyAlpha( color, options->alpha);
          nvgStrokeColor( vg, color);
 
          for( path = shape->paths; path != NULL; path = path->next)

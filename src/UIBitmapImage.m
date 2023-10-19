@@ -372,34 +372,35 @@ static const struct mulle_allocator    stbi_allocator;
    return( NO);
 }
 
-
+// TODO: move to separate category outside of project to keep UIImage
+//       "pure" ?
 - (CGImage *) cgImageWithContext:(CGContext *) context
-                      imageFlags:(NSUInteger) desiredImageFlags
+                    textureFlags:(NSUInteger) desiredImageFlags
 {
    struct CGBitmapInfo   bitmapInfo;
    CGImage               *image;
    void                  *bytes;
    int                   i;
    int                   j;
-   NSUInteger            imageFlags;
+   NSUInteger            textureFlags;
 
    bitmapInfo = _bitmap.info;
 
    //
-   // if imageFlags comes in asking for flipped and internal representation
+   // if textureFlags comes in asking for flipped and internal representation
    // is flipped already, then clear, otherwise set for "normal" display
    //
-   imageFlags = desiredImageFlags;
+   textureFlags = desiredImageFlags;
    if( CGBitmapEncodingIsFlipped( bitmapInfo.encoding))
-      imageFlags ^= NVG_IMAGE_FLIPY;
+      textureFlags ^= NVG_IMAGE_FLIPY;
 
-   // map imageFlags hopefully to a cachable index
+   // map textureFlags hopefully to a cachable index
    // we only care for lower 6 bits
    // also get cached image if present
    i     = -1;
    image = NULL;
    for( j = 0; j <_n_imageFlag_index; j++)
-      if( _imageFlag_index[ j] == (imageFlags & 0x3F))
+      if( _imageFlag_index[ j] == (textureFlags & 0x3F))
       {
          i     = _imageFlag_index[ j];
          image = mulle__pointermap_get( &_context_map[ i], context);
@@ -410,7 +411,7 @@ static const struct mulle_allocator    stbi_allocator;
    if( i == -1 && _n_imageFlag_index < UIBitmapImageNumberOfContextMappings)
    {
       i                    = _n_imageFlag_index;
-      _imageFlag_index[ i] = (imageFlags & 0x3F);
+      _imageFlag_index[ i] = (textureFlags & 0x3F);
       _n_imageFlag_index++;
    }
 
@@ -423,7 +424,7 @@ static const struct mulle_allocator    stbi_allocator;
       case CGBitmapEncodingFlipYRGBABytes :
          image = [[CGImage alloc] initWithRGBABytes:bytes
                                           bitmapSize:bitmapInfo.size
-                                          imageFlags:imageFlags
+                                        textureFlags:textureFlags
                                              context:context];
       default :
          break;
