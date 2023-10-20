@@ -9,6 +9,10 @@
  *
  *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
  */
+#ifndef mulle_ui_image_export_h__
+#define mulle_ui_image_export_h__
+
+
 #import "CGImage+UIBitmapImage.h"
 #import "MulleObjCLoader+MulleUIImage.h"
 #import "UIBitmapImage+BMPWriter.h"
@@ -17,3 +21,6 @@
 #import "UIBitmapImage.h"
 #import "UIImage.h"
 #import "UISVGImage.h"
+
+
+#endif
