@@ -14,7 +14,7 @@ export PROJECT_SOURCE_DIR="src"
 #
 #
 #
-export PROJECT_NAME="MulleUIImage"
+export PROJECT_NAME="MulleUIGraphicsImage"
 
 
 #

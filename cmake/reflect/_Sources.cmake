@@ -11,18 +11,18 @@ endif()
 # contents selected with patternfile ??-source--sources
 #
 set( SOURCES
+src/CGImage+BMPWriter.m
+src/CGImage+GIFWriter.m
+src/CGImage+PNGWriter.m
 src/CGImage+UIBitmapImage.m
-src/UIBitmapImage+BMPWriter.m
-src/UIBitmapImage+GIFWriter.m
-src/UIBitmapImage+PNGWriter.m
-src/UIBitmapImage.m
-src/UIImage.m
-src/UISVGImage.m
+src/UIBitmapImage+CGImage.m
+src/UIImage+CGImageLayer.m
+src/UISVGImage+CGImage.m
 )
 
 #
 # contents selected with patternfile ??-source--stage2-sources
 #
 set( STAGE2_SOURCES
-src/MulleObjCLoader+MulleUIImage.m
+src/MulleObjCLoader+MulleUIGraphicsImage.m
 )

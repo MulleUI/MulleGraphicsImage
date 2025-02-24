@@ -1,4 +1,4 @@
-#import <MulleUIImage/MulleUIImage.h>
+#import <MulleUIGraphicsImage/MulleUIGraphicsImage.h>
 
 
 int   main( int argc, char *argv[])
@@ -16,7 +16,7 @@ int   main( int argc, char *argv[])
 
    scaled = [image bitmapImageForBitmapInfo:CGBitmapInfoMakeWHRGBABytes( 4, 4)
                                   allocator:NULL];
-   printf( "%s\n", MulleIntegerSizeUTF8String( CGBitmapInfoGetSize( [scaled bitmapInfo])));
+   printf( "%s\n", CGPixelSizeUTF8String( CGBitmapInfoGetSize( [scaled bitmapInfo])));
    return( 0);
 }
 

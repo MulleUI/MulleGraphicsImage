@@ -99,7 +99,7 @@ int   main( int argc, char *argv[])
                             toTarget:window
                           withObject:application];
 #else
-   [application run];
+   [application runApp];
 #endif   
    return( 0);
 }

@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.15)
 
-project( MulleUIImage C)
+project( MulleUIGraphicsImage C)
 
 #
 # Turn a "Library" into an "Executable"

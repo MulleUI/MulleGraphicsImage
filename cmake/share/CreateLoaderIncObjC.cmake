@@ -20,7 +20,7 @@ if( NOT LIBRARY_NAME)
 endif()
 
 if( NOT OBJC_LOADER_INC)
-   set( OBJC_LOADER_INC "${CMAKE_SOURCE_DIR}/src/reflect/objc-loader.inc")
+   set( OBJC_LOADER_INC "${CMAKE_CURRENT_SOURCE_DIR}/src/reflect/objc-loader.inc")
 endif()
 
 #
@@ -76,10 +76,10 @@ if( CREATE_OBJC_LOADER_INC)
 
    # The preferred way:
    #
-   # _1_MulleUIImage is an object library (a collection of files).
-   # _2_MulleUIImage is the loader with OBJC_LOADER_INC.
+   # _1_MulleUIGraphicsImage is an object library (a collection of files).
+   # _2_MulleUIGraphicsImage is the loader with OBJC_LOADER_INC.
    #
-   # Produce a static library _3_MulleUIImage from _1_MulleUIImage
+   # Produce a static library _3_MulleUIGraphicsImage from _1_MulleUIGraphicsImage
    # to feed into MULLE_OBJC_LOADER_TOOL.
    #
    # The static library is, so that the commandline doesn't overflow for
@@ -150,15 +150,15 @@ if( CREATE_OBJC_LOADER_INC)
    #    PROPERTIES GENERATED FALSE
    # )
 
-   add_custom_target( "__objc_loader_inc__"
+   add_custom_target( "${LIBRARY_NAME}__objc_loader_inc__"
       DEPENDS ${OBJC_LOADER_INC}
       COMMENT "Target to build \"${OBJC_LOADER_INC}\""
    )
 
    if( TARGET "_2_${LIBRARY_NAME}")
-      add_dependencies( "_2_${LIBRARY_NAME}" "__objc_loader_inc__")
+      add_dependencies( "_2_${LIBRARY_NAME}" "${LIBRARY_NAME}__objc_loader_inc__")
    else()
-      add_dependencies( "${LIBRARY_NAME}" "__objc_loader_inc__")
+      add_dependencies( "${LIBRARY_NAME}" "${LIBRARY_NAME}__objc_loader_inc__")
    endif()
 
    # seemingly needed
@@ -167,6 +167,5 @@ if( CREATE_OBJC_LOADER_INC)
    endforeach()
 
 endif()
-
 
 include( CreateLoaderIncAuxObjC OPTIONAL)

@@ -20,8 +20,8 @@ src/reflect
 # contents selected with patternfile ??-header--private-generated-headers
 #
 set( PRIVATE_GENERATED_HEADERS
-src/reflect/_MulleUIImage-import-private.h
-src/reflect/_MulleUIImage-include-private.h
+src/reflect/_MulleUIGraphicsImage-import-private.h
+src/reflect/_MulleUIGraphicsImage-include-private.h
 )
 
 #
@@ -35,10 +35,10 @@ src/import-private.h
 # contents selected with patternfile ??-header--public-generated-headers
 #
 set( PUBLIC_GENERATED_HEADERS
-src/reflect/_MulleUIImage-export.h
-src/reflect/_MulleUIImage-import.h
-src/reflect/_MulleUIImage-include.h
-src/reflect/_MulleUIImage-provide.h
+src/reflect/_MulleUIGraphicsImage-export.h
+src/reflect/_MulleUIGraphicsImage-import.h
+src/reflect/_MulleUIGraphicsImage-include.h
+src/reflect/_MulleUIGraphicsImage-provide.h
 )
 
 #
@@ -54,15 +54,14 @@ src/import.h
 set( PUBLIC_HEADERS
 nanosvg/src/nanosvg.h
 nanosvg/src/nanosvgrast.h
+src/CGImage+BMPWriter.h
+src/CGImage+GIFWriter.h
+src/CGImage+PNGWriter.h
 src/CGImage+UIBitmapImage.h
-src/MulleObjCLoader+MulleUIImage.h
-src/MulleUIImage.h
-src/UIBitmapImage+BMPWriter.h
-src/UIBitmapImage+GIFWriter.h
-src/UIBitmapImage+PNGWriter.h
-src/UIBitmapImage.h
-src/UIImage.h
-src/UISVGImage.h
-src/stb_image_write.h
+src/MulleObjCLoader+MulleUIGraphicsImage.h
+src/MulleUIGraphicsImage.h
+src/UIBitmapImage+CGImage.h
+src/UIImage+CGImageLayer.h
+src/UISVGImage+CGImage.h
 )
 

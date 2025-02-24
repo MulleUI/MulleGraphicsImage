@@ -59,8 +59,8 @@ int   main( int argc, char *argv[])
    view = setupSceneInWindow( window);
 
    gif  = [UIAnimatedGIF animatedGIFWithUTF8String:"animated.gif"
-                                    bitmapSize:MulleIntegerSizeMake( 200, 150)
-                                     frameRate:1.0
+                                    bitmapSize:CGPixelSizeMake( 200, 150)
+                                 animationRate:1.0
                                           loop:YES];
 
    xform = CGAffineTransformMakeScaleInline( 0.9, 0.9);
@@ -72,7 +72,7 @@ int   main( int argc, char *argv[])
       screenshotBitmap = [window screenshotBitmap];
       [gif addBitmap:screenshotBitmap
         freeWhenDone:YES];
-      [gif setFrameRate:1.0 / 15.0];
+      [gif setAnimationRate:1.0 / 15.0];
 
       //
       // View frame animation is lazy. Usually you would code the animation in

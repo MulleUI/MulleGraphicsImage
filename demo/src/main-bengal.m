@@ -29,10 +29,6 @@ static UIWindow  *create_window( UIImage *tigerBitmap)
 
    [window setBackgroundColor:[UIColor yellowColor]];
 
-
-   // BUTTON IN SCROLLVIEW
-
-
    imageLayer = [[[CAImageLayer alloc] initWithImage:tigerBitmap] autorelease];
    imageView  = [[[UIImageView alloc] initWithLayer:imageLayer] autorelease];
 
@@ -76,6 +72,6 @@ int   main( int argc, char *argv[])
 
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
