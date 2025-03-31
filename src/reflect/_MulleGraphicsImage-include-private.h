@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _mulle_ui_graphics_image_include_private_h__
-#define _mulle_ui_graphics_image_include_private_h__
+#ifndef _mulle_graphics_image_include_private_h__
+#define _mulle_graphics_image_include_private_h__
 
 /* no headers */
 

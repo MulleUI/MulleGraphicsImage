@@ -1,6 +1,6 @@
 //
 //  UIBitmapImage+GIFWriter.m
-//  MulleUIGraphicsImage
+//  MulleGraphicsImage
 //
 //  Copyright (c) 2022 Nat! - Mulle kybernetiK.
 //  Copyright (c) 2022 Codeon GmbH.

@@ -1,6 +1,6 @@
-# 📸 MulleUIGraphicsImage
+# 📸 MulleGraphicsImage
 
-#### 📸 MulleUIGraphicsImage defines UIImage and provides some image file formats
+#### 📸 MulleGraphicsImage defines UIImage and provides some image file formats
 
 
 ### You are here
@@ -14,7 +14,7 @@
   '--------------------------------'
 
   .==============.
-  | MulleUIGraphicsImage |
+  | MulleGraphicsImage |
   .=====.========'
   | png |          .---------------.
   | svg |          | MulleUICore   |
@@ -43,22 +43,22 @@ apt-get install libbz2-dev
 
 ## Add
 
-Use [mulle-sde](//github.com/mulle-sde) to add MulleUIGraphicsImage to your project:
+Use [mulle-sde](//github.com/mulle-sde) to add MulleGraphicsImage to your project:
 
 ``` console
-mulle-sde dependency add --c --github MulleUI MulleUIGraphicsImage
+mulle-sde dependency add --c --github MulleUI MulleGraphicsImage
 ```
 
 ## Install
 
 ### mulle-sde
 
-Use [mulle-sde](//github.com/mulle-sde) to build and install MulleUIGraphicsImage
+Use [mulle-sde](//github.com/mulle-sde) to build and install MulleGraphicsImage
 and all its dependencies:
 
 ```
 mulle-sde install --prefix /usr/local \
-   https://github.com/MulleUI/MulleUIGraphicsImage/archive/latest.tar.gz
+   https://github.com/MulleUI/MulleGraphicsImage/archive/latest.tar.gz
 ```
 
 ### Manual Installation

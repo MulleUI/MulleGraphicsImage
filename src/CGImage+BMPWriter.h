@@ -1,6 +1,6 @@
 //
 //  CGImage+BMPWriter.m
-//  MulleUIGraphicsImage
+//  MulleGraphicsImage
 //
 //  Copyright (c) 2024 Nat! - Mulle kybernetiK.
 //  All rights reserved.

@@ -1,6 +1,6 @@
 //
 //  UIBitmapImage.m
-//  MulleUIGraphicsImage
+//  MulleGraphicsImage
 //
 //  Copyright (c) 2021 Nat! - Mulle kybernetiK.
 //  Copyright (c) 2021 Codeon GmbH.
@@ -50,6 +50,7 @@
 //       "pure" ?
 - (CGImage *) _cgImageWithContext:(CGContext *) context
                      textureFlags:(NSUInteger) desiredImageFlags
+                   nameUTF8String:(char *) nameUTF8String
 {
    struct CGBitmapInfo   bitmapInfo;
    CGImage               *image;
@@ -76,18 +77,14 @@
    for( j = 0; j <_n_imageFlag_index; j++)
       if( _imageFlag_index[ j] == (textureFlags & 0x3F))
       {
-         i     = _imageFlag_index[ j];
-         image = mulle__pointermap_get( &_context_map[ i], context);
+         image = mulle__pointermap_get( &_context_map[ j], context);
+         assert( image);
          return( image);
       }
 
    // create a new cacheable index if possible
    if( i == -1 && _n_imageFlag_index < UIBitmapImageNumberOfContextMappings)
-   {
-      i                    = _n_imageFlag_index;
-      _imageFlag_index[ i] = (textureFlags & 0x3F);
-      _n_imageFlag_index++;
-   }
+      i = _n_imageFlag_index;
 
    if( ! image)
    {
@@ -99,13 +96,20 @@
          image = [[CGImage alloc] initWithRGBABytes:bytes
                                          bitmapSize:bitmapInfo.size
                                        textureFlags:textureFlags
+                                     nameUTF8String:nameUTF8String
                                             context:context];
+         break;
+
       default :
+         abort();
          break;
       }
 
       if( ! image)
+      {
+         assert( 0);
          return( nil);
+      }
 
       if( i != -1)
       {
@@ -116,6 +120,8 @@
          // we add ourselves to the resources to remove
          // that way we can remove the image from the context map
          // [context addToResources:self];
+         _imageFlag_index[ i] = (textureFlags & 0x3F);
+         _n_imageFlag_index++;
       }
       else
          image = [image autorelease];
@@ -125,17 +131,29 @@
 
 
 - (CGImage *) cgImageWithContext:(CGContext *) context
-                     textureFlags:(NSUInteger) textureFlags
+                    textureFlags:(NSUInteger) textureFlags
+                  nameUTF8String:(char *) nameUTF8String
 {
    CGImage   *image;
 
    mulle_thread_mutex_do( _lock)
    {
       image = [self _cgImageWithContext:context
-                           textureFlags:textureFlags];
+                           textureFlags:textureFlags
+                         nameUTF8String:NULL];
+      assert( image);
       image = [[image retain] autorelease];
    }
    return( image);
+}
+
+
+- (CGImage *) cgImageWithContext:(CGContext *) context
+                    textureFlags:(NSUInteger) textureFlags;
+{
+   return( [self cgImageWithContext:context
+                       textureFlags:textureFlags
+                     nameUTF8String:NULL]);
 }
 
 
@@ -157,6 +175,8 @@
             [image autorelease];
          }
       }
+      // MEMO: this is wrong, because we have more contexts to unmap
+      //      _n_imageFlag_index = 0;
    }
 }
 
@@ -199,6 +219,5 @@
       _n_imageFlag_index = 0;
    }
 }
-
 
 @end

@@ -9,8 +9,8 @@
  *
  *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
  */
-#ifndef _mulle_ui_graphics_image__provide_h__
-#define _mulle_ui_graphics_image__provide_h__
+#ifndef _mulle_graphics_image__provide_h__
+#define _mulle_graphics_image__provide_h__
 
 
 #include "nanosvg.h"

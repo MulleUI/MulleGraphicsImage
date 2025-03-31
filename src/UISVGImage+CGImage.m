@@ -2,7 +2,7 @@
 
 #import "import-private.h"
 
-#import <MulleUIImage/nanosvg.h>
+#import <MulleImage/nanosvg.h>
 #import <errno.h>
 #import <stdio.h>
 

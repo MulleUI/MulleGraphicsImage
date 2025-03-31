@@ -13,7 +13,7 @@
 /* no headers */
 
 #ifdef __has_include
-# if __has_include( "_MulleUIGraphicsImage-include-private.h")
-#  include "_MulleUIGraphicsImage-include-private.h"
+# if __has_include( "_MulleGraphicsImage-include-private.h")
+#  include "_MulleGraphicsImage-include-private.h"
 # endif
 #endif

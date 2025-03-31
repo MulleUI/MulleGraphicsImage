@@ -1,6 +1,6 @@
 //
 //  UIBitmapImage.m
-//  MulleUIGraphicsImage
+//  MulleGraphicsImage
 //
 //  Copyright (c) 2021 Nat! - Mulle kybernetiK.
 //  Copyright (c) 2021 Codeon GmbH.
@@ -80,10 +80,12 @@
 // a CGTextureImage on demand.
 // TODO: need a lock for context_map and imageFlag
 //
-#define UIBitmapImageNumberOfContextMappings  4
-
 
 @interface UIBitmapImage( CGImage) <CGBitmapDrawable, CGContextResource>
+
+- (CGImage *) cgImageWithContext:(CGContext *) context
+                    textureFlags:(NSUInteger) textureFlags
+                   nameUTF8String:(char *) nameUTF8String;
 
 - (CGImage *) cgImageWithContext:(CGContext *) context
                     textureFlags:(NSUInteger) textureFlags;

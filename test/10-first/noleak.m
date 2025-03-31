@@ -1,4 +1,4 @@
-#import <MulleUIImage/MulleUIImage.h>
+#import <MulleGraphicsImage/MulleGraphicsImage.h>
 
 
 int   main( int argc, char *argv[])

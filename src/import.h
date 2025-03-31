@@ -27,9 +27,9 @@
    sourcetree, then you don't need it.
  */
 
-#import "_MulleUIGraphicsImage-import.h"
-#ifndef MULLE_UI_GRAPHICS_IMAGE_EXTERN_GLOBAL
-# define MULLE_UI_GRAPHICS_IMAGE_EXTERN_GLOBAL MULLE_C_EXTERN_GLOBAL
+#import "_MulleGraphicsImage-import.h"
+#ifndef MULLE_GRAPHICS_IMAGE_EXTERN_GLOBAL
+# define MULLE_GRAPHICS_IMAGE_EXTERN_GLOBAL MULLE_C_EXTERN_GLOBAL
 #endif
 
 

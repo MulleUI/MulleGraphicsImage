@@ -8,7 +8,7 @@ export PROJECT_TYPE="none"
 #
 #
 #
-export PROJECT_NAME="MulleUIGraphicsImage"
+export PROJECT_NAME="MulleGraphicsImage"
 
 
 #

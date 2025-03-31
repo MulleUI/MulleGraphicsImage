@@ -11,17 +11,17 @@ endif()
 # contents are derived from the file locations
 
 set( INCLUDE_DIRS
-nanosvg/src
-src
 src/reflect
+src
+nanosvg/src
 )
 
 #
 # contents selected with patternfile ??-header--private-generated-headers
 #
 set( PRIVATE_GENERATED_HEADERS
-src/reflect/_MulleUIGraphicsImage-import-private.h
-src/reflect/_MulleUIGraphicsImage-include-private.h
+src/reflect/_MulleGraphicsImage-import-private.h
+src/reflect/_MulleGraphicsImage-include-private.h
 )
 
 #
@@ -35,10 +35,10 @@ src/import-private.h
 # contents selected with patternfile ??-header--public-generated-headers
 #
 set( PUBLIC_GENERATED_HEADERS
-src/reflect/_MulleUIGraphicsImage-export.h
-src/reflect/_MulleUIGraphicsImage-import.h
-src/reflect/_MulleUIGraphicsImage-include.h
-src/reflect/_MulleUIGraphicsImage-provide.h
+src/reflect/_MulleGraphicsImage-export.h
+src/reflect/_MulleGraphicsImage-import.h
+src/reflect/_MulleGraphicsImage-include.h
+src/reflect/_MulleGraphicsImage-provide.h
 )
 
 #
@@ -58,8 +58,8 @@ src/CGImage+BMPWriter.h
 src/CGImage+GIFWriter.h
 src/CGImage+PNGWriter.h
 src/CGImage+UIBitmapImage.h
-src/MulleObjCLoader+MulleUIGraphicsImage.h
-src/MulleUIGraphicsImage.h
+src/MulleGraphicsImage.h
+src/MulleObjCLoader+MulleGraphicsImage.h
 src/UIBitmapImage+CGImage.h
 src/UIImage+CGImageLayer.h
 src/UISVGImage+CGImage.h

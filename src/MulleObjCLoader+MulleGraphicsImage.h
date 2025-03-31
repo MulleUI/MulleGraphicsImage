@@ -11,7 +11,7 @@
 // depend on this library to properly declare their load in their
 // MulleObjcLoader class.
 //
-@interface MulleObjCLoader( MulleUIGraphicsImage)
+@interface MulleObjCLoader( MulleGraphicsImage)
 
 + (struct _mulle_objc_dependency *) dependencies;
 

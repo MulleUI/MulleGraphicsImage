@@ -9,11 +9,11 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
 <title>sourcetree</title>
 <polygon fill="white" stroke="transparent" points="-4,4 -4,-112 411,-112 411,4 -4,4"/>
-<!-- MulleUIGraphicsImage -->
+<!-- MulleGraphicsImage -->
 <g id="node1" class="node">
-<title>MulleUIGraphicsImage</title>
+<title>MulleGraphicsImage</title>
 <polygon fill="yellow" stroke="black" points="237,-108 118,-108 118,-72 237,-72 237,-108"/>
-<text text-anchor="middle" x="177.5" y="-86.3" font-family="Times,serif" font-size="14.00">MulleUIGraphicsImage</text>
+<text text-anchor="middle" x="177.5" y="-86.3" font-family="Times,serif" font-size="14.00">MulleGraphicsImage</text>
 </g>
 <!-- MulleGraphics -->
 <g id="node2" class="node">
@@ -24,9 +24,9 @@
 </a>
 </g>
 </g>
-<!-- MulleUIGraphicsImage&#45;&gt;MulleGraphics -->
+<!-- MulleGraphicsImage&#45;&gt;MulleGraphics -->
 <g id="edge1" class="edge">
-<title>MulleUIGraphicsImage&#45;&gt;MulleGraphics</title>
+<title>MulleGraphicsImage&#45;&gt;MulleGraphics</title>
 <path fill="none" stroke="black" d="M148.88,-71.88C133.58,-62.72 114.56,-51.34 98.08,-41.48"/>
 <polygon fill="black" stroke="black" points="99.61,-38.32 89.23,-36.19 96.02,-44.33 99.61,-38.32"/>
 </g>
@@ -39,9 +39,9 @@
 </a>
 </g>
 </g>
-<!-- MulleUIGraphicsImage&#45;&gt;nanosvg -->
+<!-- MulleGraphicsImage&#45;&gt;nanosvg -->
 <g id="edge2" class="edge">
-<title>MulleUIGraphicsImage&#45;&gt;nanosvg</title>
+<title>MulleGraphicsImage&#45;&gt;nanosvg</title>
 <path fill="none" stroke="black" d="M177.5,-71.7C177.5,-63.98 177.5,-54.71 177.5,-46.11"/>
 <polygon fill="black" stroke="black" points="181,-46.1 177.5,-36.1 174,-46.1 181,-46.1"/>
 </g>
@@ -54,9 +54,9 @@
 </a>
 </g>
 </g>
-<!-- MulleUIGraphicsImage&#45;&gt;src/stb_image_write.h -->
+<!-- MulleGraphicsImage&#45;&gt;src/stb_image_write.h -->
 <g id="edge3" class="edge">
-<title>MulleUIGraphicsImage&#45;&gt;src/stb_image_write.h</title>
+<title>MulleGraphicsImage&#45;&gt;src/stb_image_write.h</title>
 <path fill="none" stroke="black" d="M212.48,-71.88C231.7,-62.47 255.73,-50.71 276.24,-40.67"/>
 <polygon fill="black" stroke="black" points="277.94,-43.73 285.38,-36.19 274.86,-37.44 277.94,-43.73"/>
 </g>

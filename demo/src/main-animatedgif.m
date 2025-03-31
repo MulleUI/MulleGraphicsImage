@@ -1,4 +1,4 @@
-#import <MulleUIImage/MulleUIImage.h>
+#import <MulleImage/MulleImage.h>
 #import "import.h"
 
 #include <unistd.h> // for _exit
