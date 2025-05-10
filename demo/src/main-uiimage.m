@@ -19,7 +19,7 @@ static void   setupSceneInWindow( UIWindow *window)
    // this works in one-window scenarios well, where there is only one
    // context.
    layer = [CAImageLayer layerWithFrame:frame];
-   image = [UIImage imageWithContentsOfFileCString:"parrot.png"];
+   image = [UIImage imageWithContentsOfFileUTF8String:"parrot.png"];
    if( ! image)
    {
       fprintf( stderr, "image \"parrot.png\" not found\n");

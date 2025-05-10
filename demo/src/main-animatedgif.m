@@ -19,7 +19,7 @@ static UIView   *setupSceneInWindow( UIWindow *window)
    // this works in one-window scenarios well, where there is only one
    // context.
    layer = [CAImageLayer layerWithFrame:frame];
-   image = [UIImage imageWithContentsOfFileCString:"parrot.png"];
+   image = [UIImage imageWithContentsOfFileUTF8String:"parrot.png"];
    if( ! image)
    {
       fprintf( stderr, "image \"parrot.png\" not found\n");
@@ -51,7 +51,7 @@ int   main( int argc, char *argv[])
    app    = [UIApplication sharedInstance];
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 400.0, 300.0)
                       titleUTF8String:NULL
-                            styleMask:UIWindowStyleBare|UIWindowStyleInvisible];
+                            styleMask:UIWindowStyleBare|UIWindowStyleHidden];
    assert( window);
 
    [window setBackgroundColor:CGColorMakeWithRGBA( 0.5, 0.5, 0.5, 1.0)];
