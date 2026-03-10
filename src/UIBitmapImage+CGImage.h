@@ -85,11 +85,9 @@
 
 - (CGImage *) cgImageWithContext:(CGContext *) context
                     textureFlags:(NSUInteger) textureFlags
-                   nameUTF8String:(char *) nameUTF8String;
+                  nameUTF8String:(char *) nameUTF8String;
 
 - (CGImage *) cgImageWithContext:(CGContext *) context
                     textureFlags:(NSUInteger) textureFlags;
-
-- (struct CGBitmapInfo) bitmapInfo;
 
 @end

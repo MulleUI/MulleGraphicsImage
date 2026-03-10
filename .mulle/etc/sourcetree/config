@@ -1,6 +1,3 @@
-z;none;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;88F6D64A-1612-432A-AB72-08E0ED42D9C0;;${Z_BRANCH};;;
-bz2;none;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;1012BD39-CB3B-4C0E-B5DB-030118C4059E;;${BZ2_BRANCH};;;
 MulleGraphics;${MULLE_GRAPHICS_NODETYPE:-tar};no-singlephase;BE03CBCA-C69F-4FCD-AFC5-69A20255D4EE;${MULLE_GRAPHICS_URL:-https://github.com/MulleUI/MulleGraphics/archive/${MULLE_TAG}.tar.gz};${MULLE_GRAPHICS_BRANCH};${MULLE_GRAPHICS_TAG:-latest};;
-png;none;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;02BCFB45-5ACD-4DBF-B1C3-7BFE405953C4;;${PNG_BRANCH};;;
 MulleImage;${MULLE_IMAGE_NODETYPE:-git};no-singlephase;6DEEB711-743D-4FFE-91E2-5CD791726025;${MULLE_IMAGE_URL:-https://github.com/MulleUI/MulleImage.git};${MULLE_IMAGE_BRANCH};${MULLE_IMAGE_TAG};;
 mulle-objc-list;${MULLE__OBJC__LIST_NODETYPE:-tar};no-all-load,no-bequeath,no-cmake-inherit,no-header,no-link,no-singlephase;63EFADB0-FD85-4745-9DA7-6FC752ACF180;${MULLE__OBJC__LIST_URL:-https://github.com/mulle-objc/mulle-objc-list/archive/${MULLE_TAG}.tar.gz};${MULLE__OBJC__LIST_BRANCH};${MULLE__OBJC__LIST_TAG:-latest};;

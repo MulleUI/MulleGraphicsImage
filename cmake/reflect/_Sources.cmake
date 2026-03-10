@@ -16,6 +16,7 @@ src/CGImage+GIFWriter.m
 src/CGImage+PNGWriter.m
 src/CGImage+UIBitmapImage.m
 src/UIBitmapImage+CGImage.m
+src/UIBitmapImage+nanovg.m
 src/UIImage+CGImageLayer.m
 src/UISVGImage+CGImage.m
 )
@@ -24,5 +25,5 @@ src/UISVGImage+CGImage.m
 # contents selected with patternfile ??-source--stage2-sources
 #
 set( STAGE2_SOURCES
-src/MulleObjCLoader+MulleGraphicsImage.m
+src/MulleObjCDeps+MulleGraphicsImage.m
 )

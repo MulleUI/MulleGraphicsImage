@@ -40,8 +40,6 @@
 
 @implementation UIBitmapImage( CGImage)
 
-
-
 /*
  * UGLY PART THAT NEEDS LOCKING
  */
@@ -149,7 +147,7 @@
 
 
 - (CGImage *) cgImageWithContext:(CGContext *) context
-                    textureFlags:(NSUInteger) textureFlags;
+                    textureFlags:(NSUInteger) textureFlags
 {
    return( [self cgImageWithContext:context
                        textureFlags:textureFlags
@@ -187,6 +185,24 @@
    [super finalize];
 }
 
+// usually same as canvas for bitmaps
+- (CGRect) bounds
+{
+   return( CGRectMake( 0, 0, _bitmap.info.size.width, _bitmap.info.size.height));
+}
+
+
+- (CGRect) canvas
+{
+   // TODO: conceivably should DPI scale here ?
+   return( CGRectMake( 0, 0, _bitmap.info.size.width, _bitmap.info.size.height));
+}
+
+
+- (BOOL) isRepeating
+{
+   return( NO);  // CGImages could say yes hmmm
+}
 
 - (void) releaseAllImages
 {
@@ -221,3 +237,5 @@
 }
 
 @end
+
+

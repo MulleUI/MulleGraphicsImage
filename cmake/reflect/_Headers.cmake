@@ -12,6 +12,7 @@ endif()
 
 set( INCLUDE_DIRS
 src/reflect
+src/generic
 src
 nanosvg/src
 )
@@ -28,7 +29,7 @@ src/reflect/_MulleGraphicsImage-include-private.h
 # contents selected with patternfile ??-header--private-generic-headers
 #
 set( PRIVATE_GENERIC_HEADERS
-src/import-private.h
+src/generic/import-private.h
 )
 
 #
@@ -45,7 +46,7 @@ src/reflect/_MulleGraphicsImage-provide.h
 # contents selected with patternfile ??-header--public-generic-headers
 #
 set( PUBLIC_GENERIC_HEADERS
-src/import.h
+src/generic/import.h
 )
 
 #
@@ -59,8 +60,9 @@ src/CGImage+GIFWriter.h
 src/CGImage+PNGWriter.h
 src/CGImage+UIBitmapImage.h
 src/MulleGraphicsImage.h
-src/MulleObjCLoader+MulleGraphicsImage.h
+src/MulleObjCDeps+MulleGraphicsImage.h
 src/UIBitmapImage+CGImage.h
+src/UIBitmapImage+nanovg.h
 src/UIImage+CGImageLayer.h
 src/UISVGImage+CGImage.h
 )
