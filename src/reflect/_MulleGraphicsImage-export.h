@@ -19,7 +19,6 @@
 #import "CGImage+UIBitmapImage.h"
 #import "MulleObjCDeps+MulleGraphicsImage.h"
 #import "UIBitmapImage+CGImage.h"
-#import "UIBitmapImage+nanovg.h"
 #import "UIImage+CGImageLayer.h"
 #import "UISVGImage+CGImage.h"
 

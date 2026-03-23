@@ -65,7 +65,7 @@
    //
    textureFlags = desiredImageFlags;
    if( CGBitmapEncodingIsFlipped( bitmapInfo.encoding))
-      textureFlags ^= NVG_IMAGE_FLIPY;
+      textureFlags ^= CGImageFlagFlipY;
 
    // map textureFlags hopefully to a cachable index
    // we only care for lower 6 bits
@@ -132,6 +132,7 @@
                     textureFlags:(NSUInteger) textureFlags
                   nameUTF8String:(char *) nameUTF8String
 {
+   MULLE_C_UNUSED( nameUTF8String);
    CGImage   *image;
 
    mulle_thread_mutex_do( _lock)

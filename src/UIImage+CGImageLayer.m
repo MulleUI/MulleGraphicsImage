@@ -6,12 +6,6 @@
 
 @implementation UIImage( CGImageLayer)
 
-- (Class) preferredImageLayerClass
-{
-   return( [CAImageLayer class]);
-}
-
-
 // always 0,0, size
 - (CGRect) canvas
 {
@@ -35,6 +29,9 @@
           options:(CGDrawableOptions *) options
           context:(CGContext *) context
 {
+   MULLE_C_UNUSED( rect);
+   MULLE_C_UNUSED( options);
+   MULLE_C_UNUSED( context);
    MULLE_OBJC_SUBCLASS_REQUIRES_IMPLEMENTATION;
 }
 

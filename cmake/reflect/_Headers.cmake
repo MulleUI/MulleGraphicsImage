@@ -62,7 +62,6 @@ src/CGImage+UIBitmapImage.h
 src/MulleGraphicsImage.h
 src/MulleObjCDeps+MulleGraphicsImage.h
 src/UIBitmapImage+CGImage.h
-src/UIBitmapImage+nanovg.h
 src/UIImage+CGImageLayer.h
 src/UISVGImage+CGImage.h
 )
