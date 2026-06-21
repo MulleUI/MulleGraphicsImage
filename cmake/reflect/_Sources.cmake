@@ -15,6 +15,7 @@ src/CGImage+BMPWriter.m
 src/CGImage+GIFWriter.m
 src/CGImage+PNGWriter.m
 src/CGImage+UIBitmapImage.m
+src/UIBitmapImage+CGImageLayer.m
 src/UIBitmapImage+CGImage.m
 src/UIImage+CGImageLayer.m
 src/UISVGImage+CGImage.m

@@ -7,7 +7,7 @@ export MULLE_MATCH_PATH=".mulle/etc/sourcetree/config:${PROJECT_SOURCE_DIR}:CMak
 #
 #
 #
-export MULLE_CRAFT_PLATFORMS="${MULLE_UNAME}:windows"
+export MULLE_CRAFT_PLATFORMS="${MULLE_UNAME}"
 
 
 #
