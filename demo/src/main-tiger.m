@@ -16,11 +16,7 @@ static UIWindow  *create_window( void)
    CAImageLayer       *imageLayer;
    CGRect             frame;
    CGRect             windowFrame;
-   CGRect             bounds;
    UIWindow           *window;
-   UIView             *view;
-   UIView             *contentView;
-   UIButton           *button;
    UIScrollView       *scroller;
    UIImageView        *imageView;
    UIImage            *tigerImage;
@@ -31,9 +27,9 @@ static UIWindow  *create_window( void)
 
    styleMask  = UIWindowStyleMaskDefault;
    styleMask &= ~UIWindowStyleRetained;
-   window = [UIWindow windowWithFrame:windowFrame
-                      titleUTF8String:"Demo"
-                            styleMask:styleMask];
+   window     = [UIWindow windowWithFrame:windowFrame
+                          titleUTF8String:"Demo"
+                                styleMask:styleMask];
    assert( window);
 
    [window setBackgroundColor:[UIColor yellowColor]];
@@ -48,12 +44,12 @@ static UIWindow  *create_window( void)
    imageLayer = [CAImageLayer layerWithImage:tigerImage];
    imageView  = [UIImageView viewWithLayer:imageLayer];
 
-   fprintf( stderr, "view: %p f=[%s] c=[%s]\n", 
+   MulleUICLog( "view: %#@ f=[%s] c=[%s]\n",
                         imageView, 
                         CGRectUTF8String( [imageView frame]),
                         CGRectUTF8String( [imageView contentRect]));
 
-   fprintf( stderr, "layer: %p f=[%s] c=[%s]\n", 
+   MulleUICLog( "layer: %#@ f=[%s] c=[%s]\n",
                         imageLayer, 
                         CGRectUTF8String( [imageLayer frame]),
                         CGRectUTF8String( [imageLayer canvas]));
@@ -76,7 +72,6 @@ static UIWindow  *create_window( void)
 
 int   main( int argc, char *argv[])
 {
-   CGContext       *context;
    UIWindow        *window;
    UIApplication   *application;
 

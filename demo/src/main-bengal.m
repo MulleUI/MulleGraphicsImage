@@ -15,10 +15,7 @@ static UIWindow  *create_window( UIImage *tigerBitmap)
    CAImageLayer    *imageLayer;
    CGRect          frame;
    CGRect          windowFrame;
-   CGRect          bounds;
    UIWindow        *window;
-   UIView          *view;
-   UIView          *contentView;
    UIScrollView    *scroller;
    UIImageView     *imageView;
 

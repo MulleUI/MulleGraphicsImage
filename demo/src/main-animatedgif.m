@@ -49,6 +49,8 @@ int   main( int argc, char *argv[])
    struct CGBitmap     screenshotBitmap;
 
    app    = [UIApplication sharedInstance];
+   MULLE_C_UNUSED( app);
+
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 400.0, 300.0)
                       titleUTF8String:NULL
                             styleMask:UIWindowStyleBare|UIWindowStyleHidden];
@@ -63,7 +65,7 @@ int   main( int argc, char *argv[])
                                  animationRate:1.0
                                           loop:YES];
 
-   xform = CGAffineTransformMakeScaleInline( 0.9, 0.9);
+   xform = CGAffineTransformMakeScaleInline( CGVectorMake( 0.9, 0.9));
 
    for( i = 0; i < 10; i++)
    {

@@ -3,6 +3,7 @@
 
 @interface UIImage( CGImageLayer) < CGDrawable>
 
+@optional
 - (Class) preferredImageLayerClass;
 
 @end
