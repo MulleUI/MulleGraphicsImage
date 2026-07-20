@@ -1,11 +1,11 @@
 #
-# MulleGraphicsImage nodetype: ${MULLE_GRAPHICS_IMAGE_NODETYPE:-git}
+# MulleGraphicsImage nodetype: ${MULLE_GRAPHICS_IMAGE_NODETYPE:-tar}
 #
 export MULLE_GRAPHICS_IMAGE_NODETYPE="git"
 
 
 #
-# MulleGraphicsImage url: ${MULLE_GRAPHICS_IMAGE_URL:-https://github.com/MulleUI/MulleGraphicsImage.git}
+# MulleGraphicsImage url: ${MULLE_GRAPHICS_IMAGE_URL:-https://github.com/MulleUI/MulleGraphicsImage/archive/${MULLE_TAG}.tar.gz}
 #
 export MULLE_GRAPHICS_IMAGE_URL="https://github.com/MulleUI/MulleGraphicsImage.git"
 

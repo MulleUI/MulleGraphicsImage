@@ -305,13 +305,13 @@ export MULLE_CA_BRANCH="prerelease"
 
 
 #
-# MulleImage nodetype: ${MULLE_IMAGE_NODETYPE:-git}
+# MulleImage nodetype: ${MULLE_IMAGE_NODETYPE:-tar}
 #
 export MULLE_IMAGE_NODETYPE="git"
 
 
 #
-# MulleImage url: ${MULLE_IMAGE_URL:-https://github.com/MulleUI/MulleImage.git}
+# MulleImage url: ${MULLE_IMAGE_URL:-https://github.com/MulleUI/MulleImage/archive/${MULLE_TAG}.tar.gz}
 #
 export MULLE_IMAGE_URL="https://github.com/MulleUI/MulleImage.git"
 

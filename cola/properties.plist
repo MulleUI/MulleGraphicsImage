@@ -1,0 +1,41 @@
+{
+   project =
+   {
+      description="📸 MulleGraphicsImage defines UIImage and provides some image file formats";
+      domain="github";
+      language="c";
+      dialect="objc";
+      name="MulleGraphicsImage";
+      user="MulleUI";
+      repo="MulleGraphicsImage";
+      homepage="https://github.com/MulleUI/MulleGraphicsImage";
+      license="UNLICENSED";
+   };
+   dependencies =
+   (
+      {
+         description="🌠 MulleGraphics provides CALayer subclasses";
+         domain="github";
+         name="MulleGraphics";
+         repo="MulleGraphics";
+         url="https://github.com/MulleUI/MulleGraphics";
+         user="MulleUI";
+      },
+      {
+         description="📸 MulleImage defines UIImage and provides some image file formats";
+         domain="github";
+         name="MulleImage";
+         repo="MulleImage";
+         url="https://github.com/MulleUI/MulleImage";
+         user="MulleUI";
+      },
+      {
+         description="📒 Lists mulle-objc runtime information contained in executables.";
+         domain="github";
+         name="mulle-objc-list";
+         repo="mulle-objc-list";
+         url="https://github.com/mulle-objc/mulle-objc-list";
+         user="mulle-objc";
+      }
+   );
+}
