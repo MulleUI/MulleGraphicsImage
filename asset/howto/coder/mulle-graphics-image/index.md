@@ -22,6 +22,7 @@ mulle-sde code search CGImage
 - `src/UIBitmapImage+CGImage.h`
 - `src/CGImage+UIBitmapImage.h`
 - `src/UIImage+CGImageLayer.h`
+- `src/UIImage+CGImageLayer.m`
 - `src/UISVGImage+CGImage.h`
 - `src/CGImage+PNGWriter.h`
 - `src/CGImage+GIFWriter.h`
@@ -42,7 +43,7 @@ mulle-sde code search CGImage
 | Share bitmap pixels with render contexts | `src/UIBitmapImage+CGImage.h`, `src/UIBitmapImage+CGImage.m` | `UIBitmapImage` is treated as immutable and caches `CGImage` objects per `CGContext` and texture-flag combination. |
 | Render SVG through the drawable pipeline | `src/UISVGImage+CGImage.h`, `src/UISVGImage+CGImage.m` | SVG support is local `CGVectorDrawable` glue, not a bitmap conversion shortcut. |
 | Export rendered output | `src/CGImage+PNGWriter.m`, `src/CGImage+GIFWriter.m`, `src/CGImage+BMPWriter.m`, `demo/src/main-animatedgif.m` | Static export goes through `CGImage` writer categories; animated GIF creation is a separate `UIAnimatedGIF` flow. |
-| Add a new image subclass hook | `src/UIImage+CGImageLayer.h`, `src/UIImage+CGImageLayer.m` | New `UIImage` subclasses must provide `drawRect:options:context:` and `isRepeating`; `canvas` and `bounds` stay origin-based. |
+| Add a new image subclass hook | `src/UIImage+CGImageLayer.h`, `src/UIImage+CGImageLayer.m` | New `UIImage` subclasses must provide `drawRect:options:context:` and `isRepeating`; `canvas` and `bounds` stay origin-based. `preferredImageLayerClass` is `@optional`. |
 
 ## Local workflow
 

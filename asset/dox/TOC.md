@@ -7,6 +7,11 @@ MulleGraphicsImage defines UIImage and provides image file format support for th
 
 The primary purpose is to enable image loading, display, and export in MulleUI applications. This library is part of the MulleUI framework stack, positioned between MulleGraphics (low-level graphics) and MulleUICore (UI components).
 
+**Version macro** available since v0.0.1:
+```c
+#define MULLE_GRAPHICS_IMAGE_VERSION  ((0UL << 20) | (0 << 8) | 1)
+```
+
 ## 2. Key Concepts & Design Philosophy
 
 **Bridge Architecture**: MulleGraphicsImage acts as a bridge connecting image data representations (from MulleImage) with graphics rendering contexts (from MulleGraphics). It provides bidirectional conversion between UIBitmapImage and CGImage.
@@ -19,7 +24,11 @@ The primary purpose is to enable image loading, display, and export in MulleUI a
 
 **Format Abstraction**: The library abstracts file format details through writer categories (PNGWriter, GIFWriter, BMPWriter), providing a consistent interface regardless of the underlying format implementation.
 
-**Protocols for Drawable Integration**: The categories implement protocols like CGBitmapDrawable, CGVectorDrawable, CGPaintable, and CGDrawable to integrate with the MulleGraphics rendering pipeline.
+**Protocols for Drawable Integration**: The categories implement protocols like CGBitmapDrawable, CGVectorDrawable, and CGDrawable to integrate with the MulleGraphics rendering pipeline. UIBitmapImage acts as a CGBitmapDrawable for direct rendering and provides fill/stroke pattern support via its private CGImageLayer category using CGContext pattern APIs (CGContextSetFillImagePattern, CGContextSetStrokeImagePattern).
+
+**CGContext-Based Rendering**: All rendering (bitmap drawing, fill/stroke patterns, SVG vector graphics) is performed through CGContext APIs. The library has no runtime dependency on nanovg for rendering; nanosvg is used only for SVG file parsing.
+
+**Factory Methods Preferred**: Use `+imageWithBytes:bitmapInfo:allocator:` instead of alloc/init patterns. The allocator parameter controls memory ownership; pass `&mulle_default_allocator` for dynamic memory or `NULL` for static buffers.
 
 ## 3. Core API & Data Structures
 
@@ -28,7 +37,7 @@ The primary purpose is to enable image loading, display, and export in MulleUI a
 #### Category `CGImage( UIBitmapImage)`
 - **Purpose:** Converts a CGImage (texture/GPU image) to a UIBitmapImage (CPU-side bitmap).
 - **Core Operations:**
-  - `-bitmapImage`: Extracts RGBA byte bitmap from CGImage and wraps it in a UIBitmapImage.
+  - `- (UIBitmapImage *) bitmapImage`: Extracts RGBA byte bitmap from CGImage and wraps it in a UIBitmapImage.
 
 ### 3.2. `UIBitmapImage+CGImage.h`
 
@@ -39,71 +48,84 @@ The primary purpose is to enable image loading, display, and export in MulleUI a
   - Supports flipped and non-flipped bitmap encodings (CGBitmapEncodingRGBABytes, CGBitmapEncodingFlipYRGBABytes).
   - Thread-safe through mutex locking (`_lock`).
 - **Core Operations:**
-  - `-cgImageWithContext:textureFlags:nameUTF8String:`: Creates or retrieves cached CGImage for the given context with specific texture flags and optional debug name.
-  - `-cgImageWithContext:textureFlags:`: Same as above but without debug name parameter.
+  - `- (CGImage *) cgImageWithContext:(CGContext *) context textureFlags:(NSUInteger) textureFlags nameUTF8String:(char *) nameUTF8String`: Creates or retrieves cached CGImage for the given context with specific texture flags and optional debug name.
+  - `- (CGImage *) cgImageWithContext:(CGContext *) context textureFlags:(NSUInteger) textureFlags`: Same as above but without debug name parameter.
 - **Caching Mechanism:**
   - Up to `UIBitmapImageNumberOfContextMappings` different texture flag configurations can be cached per UIBitmapImage.
   - Each configuration maintains a map from CGContext pointer to CGImage instance.
-  - Texture flags control image properties like vertical flipping (NVG_IMAGE_FLIPY).
+  - Texture flags control image properties like vertical flipping (CGImageFlagFlipY).
+  - When the UIBitmapImage is removed from a context (via `didRemoveFromContext:`), all cached CGImage instances for that context are released.
+- **Private Category `UIBitmapImage( CGImageLayer)`** (implemented in `UIBitmapImage+CGImageLayer.m`, no public header):
+  - Provides fill/stroke pattern painting by obtaining a CGImage texture and delegating to CGContext pattern APIs.
+  - `- (void) drawRect:(CGRect) rect options:(CGDrawableOptions *) options context:(CGContext *) context`: Delegates to `CGContextDrawBitmapDrawableInRect` with both source and destination rects matching.
+  - `- (void) fillWithBounds:(CGRect) rect options:(struct CGFillOptions *) options context:(CGContext *) context`: Obtains the CGImage from the context cache, retrieves its textureID, and calls `CGContextSetFillImagePattern` with the bounds, rotation, and alpha from options before filling.
+  - `- (void) strokeWithBounds:(CGRect) rect strokeWidth:(CGFloat) strokeWidth options:(struct CGStrokeOptions *) options context:(CGContext *) context`: Obtains the CGImage texture and calls `CGContextSetStrokeImagePattern`, sets stroke width, and strokes.
 
-### 3.3. `UIBitmapImage+nanovg.h`
-
-#### Category `UIBitmapImage( nanovg) <CGPaintable>`
-- **Purpose:** Marks UIBitmapImage as paintable in nanovg-based rendering contexts.
-- **Core Operations:**
-  - Conforms to CGPaintable protocol for integration with nanovg paint system.
-
-### 3.4. `UIImage+CGImageLayer.h`
+### 3.3. `UIImage+CGImageLayer.h`
 
 #### Category `UIImage( CGImageLayer) <CGDrawable>`
 - **Purpose:** Enables UIImage subclasses to participate in CGDrawable rendering pipeline.
 - **Core Operations:**
-  - `-preferredImageLayerClass`: Returns the preferred layer class for rendering this image type.
+  - `- (Class) preferredImageLayerClass` (`@optional`): Returns the preferred layer class for rendering this image type. Subclasses may override to provide a specific CAImageLayer subclass. Declared `@optional` — subclasses are not required to implement it. No default implementation is provided; the base UIImage class does not implement this method.
+  - `- (CGRect) canvas`: Returns the canvas bounds for the image layer (0, 0, size).
+  - `- (void) drawRect:(CGRect) rect options:(CGDrawableOptions *) options context:(CGContext *) context`: Draws the image into the given rect. Default implementation raises `MULLE_OBJC_SUBCLASS_REQUIRES_IMPLEMENTATION`.
+  - `- (CGRect) bounds`: Returns bounds matching the size (0, 0, size).
+  - `- (BOOL) isRepeating`: Whether the image repeats. Default implementation raises `MULLE_OBJC_SUBCLASS_REQUIRES_IMPLEMENTATION`.
 
-### 3.5. `UISVGImage+CGImage.h`
+### 3.4. `UISVGImage+CGImage.h`
 
 #### Category `UISVGImage( CGImage) <CGVectorDrawable>`
-- **Purpose:** Enables SVG images to be rendered through the CGDrawable system.
+- **Purpose:** Enables SVG images to be rendered through the CGDrawable system using CGContext vector drawing APIs. SVG file parsing is performed by nanosvg (NSVGImage structure), but all rendering uses CGContext primitives exclusively — there is no nanovg rendering dependency.
 - **Core Operations:**
-  - `-drawRect:options:context:`: Renders the SVG content into the specified rectangle using the given context.
+  - `- (void) drawRect:(CGRect) rect options:(CGDrawableOptions *) options context:(CGContext *) context`: Renders the SVG content into the specified rectangle using pure CGContext path operations.
+- **Implementation Notes:**
+  - Parses the nanosvg NSVGImage structure and iterates shapes and paths.
+  - Uses `CGColorMakeWithRGBABytes` for color conversion from NSVG uint32_t color values.
+  - Computes a projection transform from SVG bounds to target rect using `CGAffineTransformMakeProjection`.
+  - Wraps rendering in `CGContextSave`/`CGContextRestore` and applies the transform via `CGContextTransform`.
+  - Path construction: `CGContextBeginPath`, `CGContextMoveTo`, `CGContextBezierTo`, `CGContextLineTo` (for closed paths).
+  - Fill and stroke colors set via `CGContextFillColor`/`CGContextStrokeColor` with alpha multiplication (`CGColorMultiplyAlpha`).
+  - Stroke width set via `CGContextStrokeWidth`.
+  - Fill and stroke operations: `CGContextFill`/`CGContextStroke`.
+  - Enforces restrictions: `options->cornerInsets` must be all zero, `options->scale == NO`, `options->rotation == 0.0` (asserted).
 
-### 3.6. `CGImage+PNGWriter.h`
+### 3.5. `CGImage+PNGWriter.h`
 
 #### Category `CGImage( PNGWriter)`
 - **Purpose:** Exports CGImage to PNG file format.
 - **Core Operations:**
-  - `-writeToPNGUTF8String:`: Writes the image to a PNG file at the specified path (C string).
+  - `- (BOOL) writeToPNGUTF8String:(char *) filename`: Writes the image to a PNG file at the specified path (C string).
 - **Implementation Notes:**
   - Converts CGImage to UIBitmapImage first, then uses libpng for writing.
 
-### 3.7. `CGImage+GIFWriter.h`
+### 3.6. `CGImage+GIFWriter.h`
 
 #### Category `CGImage( GIFWriter)`
 - **Purpose:** Exports CGImage to GIF file format.
 - **Core Operations:**
-  - `-writeToGIFUTF8String:`: Writes the image to a GIF file at the specified path (C string).
+  - `- (BOOL) writeToGIFUTF8String:(char *) filename`: Writes the image to a GIF file at the specified path (C string).
 - **Implementation Notes:**
   - Converts CGImage to UIBitmapImage first, then uses stb_image_write for GIF encoding.
 
-### 3.8. `CGImage+BMPWriter.h`
+### 3.7. `CGImage+BMPWriter.h`
 
 #### Category `CGImage( BMPWriter)`
 - **Purpose:** Exports CGImage to BMP file format.
 - **Core Operations:**
-  - `-writeToBMPUTF8String:`: Writes the image to a BMP file at the specified path (C string).
+  - `- (BOOL) writeToBMPUTF8String:(char *) filename`: Writes the image to a BMP file at the specified path (C string).
 - **Implementation Notes:**
   - Converts CGImage to UIBitmapImage first, then uses stb_image_write for BMP encoding.
 
-### 3.9. `MulleObjCLoader+MulleGraphicsImage.h`
+### 3.8. `MulleObjCDeps+MulleGraphicsImage.h`
 
-#### Category `MulleObjCLoader( MulleGraphicsImage)`
+#### Category `MulleObjCDeps( MulleGraphicsImage)`
 - **Purpose:** Provides Objective-C runtime loader integration for the library.
 - **Core Operations:**
-  - Automatically invoked during library loading to register classes and categories.
+  - `+ (struct _mulle_objc_dependency *) dependencies`: Returns dependency information for the runtime loader. Automatically invoked during library loading to register classes and categories.
 
 ## 4. Performance Characteristics
 
-**Context Caching**: The UIBitmapImage context cache provides O(1) lookup for previously created CGImage instances, avoiding redundant texture uploads. Cache misses require texture creation which involves GPU memory allocation - typically O(n) where n is the pixel count.
+**Context Caching**: The UIBitmapImage context cache provides O(1) lookup for previously created CGImage instances, avoiding redundant texture uploads. Cache misses require texture creation which involves GPU memory allocation — typically O(n) where n is the pixel count.
 
 **Thread-Safety**: UIBitmapImage context map operations are protected by a mutex, which may introduce contention in highly multithreaded rendering scenarios. However, once a CGImage is cached for a context, retrieval is lock-protected but fast.
 
@@ -113,31 +135,33 @@ The primary purpose is to enable image loading, display, and export in MulleUI a
 
 **Immutability Benefits**: The immutable design of UIBitmapImage allows safe sharing across threads without additional synchronization beyond the context cache lock.
 
-**SVG Rendering**: UISVGImage rendering performance depends on the complexity of the vector graphics. Each render call may involve path tessellation and fill operations - typically O(n) for n vector primitives.
+**SVG Rendering**: UISVGImage rendering performance depends on the complexity of the vector graphics. Each render call iterates through all shapes and paths — O(n) for n vector primitives. All path and color operations use CGContext APIs directly rather than nanovg, providing a unified rendering pipeline with the rest of the MulleGraphics framework.
 
 ## 5. AI Usage Recommendations & Patterns
 
 ### Best Practices
 
-- **Always use factory methods or designated initializers**: Create UIBitmapImage instances using `+imageWithBytes:bitmapInfo:allocator:` or `-initWithBitmap:freeWhenDone:`.
+- **Always use factory methods**: Create UIBitmapImage instances using `+imageWithBytes:bitmapInfo:allocator:` rather than alloc/init patterns.
 
 - **Specify allocator carefully**: When creating UIBitmapImage with dynamic memory, provide `&mulle_default_allocator`. For static/stack buffers, pass `NULL` to indicate no deallocation is needed.
 
 - **Reuse UIBitmapImage instances**: Take advantage of the context cache by sharing UIBitmapImage instances across multiple render operations and contexts.
 
-- **Use appropriate texture flags**: When obtaining CGImage from UIBitmapImage, specify texture flags that match your rendering requirements (e.g., NVG_IMAGE_FLIPY for flipped rendering).
+- **Use appropriate texture flags**: When obtaining CGImage from UIBitmapImage, specify texture flags that match your rendering requirements (e.g., CGImageFlagFlipY for flipped coordinate systems).
 
-- **Export through CGImage categories**: To write images to files, use the convenience methods on CGImage (writeToPNGUTF8String:, etc.) rather than accessing UIBitmapImage directly.
+- **Export through CGImage categories**: To write images to files, use the convenience methods on CGImage (writeToPNGUTF8String:, writeToGIFUTF8String:, writeToBMPUTF8String:) rather than accessing UIBitmapImage directly.
 
 ### Common Pitfalls
 
 - **Do not modify bitmap data after creation**: UIBitmapImage assumes immutability. Modifying the underlying bytes after creation will cause undefined behavior in cached textures.
 
-- **Be aware of memory ownership**: If `freeWhenDone:YES` is specified, the UIBitmapImage will free the bitmap bytes on deallocation. Ensure the bytes were allocated with a compatible allocator.
+- **Be aware of memory ownership**: If you passed a valid allocator at creation time, the UIBitmapImage will free the bitmap bytes on deallocation. Ensure the bytes were allocated with a compatible allocator. If you passed `NULL` as allocator, the caller retains ownership.
 
 - **Context resource management**: CGImage instances are tied to their creating CGContext. Do not use a CGImage with a different context than it was created for.
 
 - **Thread-safety limitations**: While UIBitmapImage's context cache is thread-safe, the CGImage instances themselves and the CGContext are not. Ensure proper synchronization when rendering from multiple threads.
+
+- **SVG render options**: UISVGImage drawRect: currently requires `options->scale == NO`, `options->rotation == 0.0`, and `options->cornerInsets` all zero (enforced by assertions).
 
 ### Idiomatic Usage
 
@@ -158,18 +182,14 @@ int   main( int argc, char *argv[])
    struct CGBitmapInfo    info;
    UIBitmapImage          *image;
 
-   // Allocate bitmap bytes (8x8 pixels, 4 bytes per pixel RGBA)
    bytes = mulle_malloc( 256);
-   
-   // Define bitmap properties
+
    info  = CGBitmapInfoMakeWHRGBABytes( 8, 8);
-   
-   // Create UIBitmapImage with ownership transfer
+
    image = [UIBitmapImage imageWithBytes:bytes
                               bitmapInfo:info
                                allocator:&mulle_default_allocator];
-   
-   // Image now owns the bytes and will free them on deallocation
+
    return( 0);
 }
 ```
@@ -183,15 +203,12 @@ int   main( int argc, char *argv[])
    struct CGBitmapInfo    info;
    UIBitmapImage          *image;
 
-   // Use stack-allocated buffer
    info  = CGBitmapInfoMakeWHRGBABytes( 8, 8);
-   
-   // Create UIBitmapImage without ownership transfer (NULL allocator)
+
    image = [UIBitmapImage imageWithBytes:bytes
                               bitmapInfo:info
                                allocator:NULL];
-   
-   // Image will not free the bytes - caller manages lifetime
+
    return( 0);
 }
 ```
@@ -206,20 +223,17 @@ int   main( int argc, char *argv[])
    UIBitmapImage          *image;
    UIBitmapImage          *scaled;
 
-   // Create original 8x8 image
    bytes = mulle_malloc( 256);
    info  = CGBitmapInfoMakeWHRGBABytes( 8, 8);
    image = [UIBitmapImage imageWithBytes:bytes
                               bitmapInfo:info
                                allocator:&mulle_default_allocator];
 
-   // Scale down to 4x4
    scaled = [image bitmapImageForBitmapInfo:CGBitmapInfoMakeWHRGBABytes( 4, 4)
                                   allocator:NULL];
-   
-   // Print resulting size
+
    printf( "%s\n", CGPixelSizeUTF8String( CGBitmapInfoGetSize( [scaled bitmapInfo])));
-   
+
    return( 0);
 }
 ```
@@ -231,16 +245,12 @@ void   renderImage( UIBitmapImage *bitmapImage, CGContext *context)
 {
    CGImage         *textureImage;
    NSUInteger      flags;
-   
-   // Specify texture flags (e.g., flipY for OpenGL coordinate system)
-   flags        = NVG_IMAGE_FLIPY;
-   
-   // Get or create cached CGImage for this context
+
+   flags        = CGImageFlagFlipY;
+
    textureImage = [bitmapImage cgImageWithContext:context
                                      textureFlags:flags];
-   
-   // Use textureImage for rendering operations
-   // (The image is cached and reused for subsequent calls)
+
 }
 ```
 
@@ -250,10 +260,9 @@ void   renderImage( UIBitmapImage *bitmapImage, CGContext *context)
 void   exportToPNG( CGImage *image, char *filename)
 {
    BOOL   success;
-   
-   // Write image to PNG file
+
    success = [image writeToPNGUTF8String:filename];
-   
+
    if( ! success)
    {
       fprintf( stderr, "Failed to write PNG file: %s\n", filename);
@@ -269,13 +278,11 @@ void   exportToAllFormats( CGImage *image, char *basePath)
    char   pngPath[ 256];
    char   gifPath[ 256];
    char   bmpPath[ 256];
-   
-   // Build file paths
+
    sprintf( pngPath, "%s.png", basePath);
    sprintf( gifPath, "%s.gif", basePath);
    sprintf( bmpPath, "%s.bmp", basePath);
-   
-   // Export to all supported formats
+
    [image writeToPNGUTF8String:pngPath];
    [image writeToGIFUTF8String:gifPath];
    [image writeToBMPUTF8String:bmpPath];
@@ -291,20 +298,33 @@ int   main( int argc, char *argv[])
    struct CGBitmapInfo    info;
    UIBitmapImage          *image;
 
-   // Create UIBitmapImage with proper allocator
    bytes = mulle_malloc( 256);
    info  = CGBitmapInfoMakeWHRGBABytes( 8, 8);
    image = [UIBitmapImage imageWithBytes:bytes
                               bitmapInfo:info
                                allocator:&mulle_default_allocator];
-   
-   // Check thread-safety capability
+
    mulle_printf( "%btd\n", [image mulleIsThreadSafe]);
-   
-   // UIBitmapImage is thread-safe for context cache access
-   // Multiple threads can safely call cgImageWithContext:
-   
+
    return( 0);
+}
+```
+
+### Example 8: Using UIBitmapImage as a Fill Pattern
+
+```c
+void   fillRectWithBitmapPattern( UIBitmapImage *bitmapImage,
+                                  CGRect rect,
+                                  CGContext *context)
+{
+   struct CGFillOptions   fillOptions;
+
+   fillOptions             = CGFillOptionsDefault;
+   fillOptions.paint.alpha = 0.75f;
+
+   [bitmapImage fillWithBounds:rect
+                       options:&fillOptions
+                       context:context];
 }
 ```
 
@@ -312,11 +332,11 @@ int   main( int argc, char *argv[])
 
 MulleGraphicsImage depends on the following mulle-sde libraries:
 
-- **MulleGraphics**: Provides CGImage, CGContext, CGBitmapInfo, and the core graphics rendering infrastructure. Defines protocols like CGDrawable, CGBitmapDrawable, and CGVectorDrawable.
+- **MulleGraphics**: Provides CGImage, CGContext, CGBitmapInfo, and the core graphics rendering infrastructure. Defines protocols like CGDrawable, CGBitmapDrawable, and CGVectorDrawable, as well as CGContext pattern APIs (CGContextSetFillImagePattern, CGContextSetStrokeImagePattern) and drawing functions (CGContextDrawBitmapDrawableInRect, CGContextTransform, etc.).
 
-- **MulleImage**: Provides UIImage, UIBitmapImage, and UISVGImage base classes. Defines the image data structures and basic image operations.
+- **MulleImage**: Provides UIImage, UIBitmapImage, and UISVGImage base classes. Defines the image data structures and basic image operations. Includes the nanosvg header library for SVG file parsing.
 
-- **mulle-objc-list**: Build-time dependency for Objective-C project support (not linked).
+- **mulle-objc-list**: Build-time dependency for Objective-C project support (not linked, not bequeathed, no header).
 
 Additionally, the library depends on system libraries:
 
@@ -324,7 +344,7 @@ Additionally, the library depends on system libraries:
 - **libbz2** (bz2): Compression library dependency for PNG support.
 - **libz** (z): Compression library dependency for PNG support.
 
-Third-party libraries embedded or included:
+Third-party libraries:
 
-- **nanosvg**: SVG parsing and rendering (header-only library in nanosvg/ directory).
+- **nanosvg**: SVG file format parsing (header-only library in MulleImage, both nanosvg.h and nanosvgrast.h). Note: nanosvg is used only for parsing SVG file content into NSVGImage structures. All rendering is performed through CGContext APIs — there is no runtime rendering dependency on nanovg.
 - **stb_image_write**: Image writing for GIF and BMP formats (header-only library).

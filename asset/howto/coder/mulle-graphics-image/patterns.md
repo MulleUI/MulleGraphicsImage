@@ -16,6 +16,8 @@ image = [UIImage imageWithContentsOfFileUTF8String:"parrot.png"];
 
 This is the shape used in `demo/src/main-uiimage.m`. The same layer path is also used for SVG-backed `UIImage` values.
 
+Custom `UIImage` subclasses can optionally override `preferredImageLayerClass` (declared `@optional` in `src/UIImage+CGImageLayer.h`) to return a different `CALayer` subclass for rendering.
+
 ## Load embedded file data with `allocator:NULL`
 
 When the bytes are compiled into the binary, pass them as borrowed storage.

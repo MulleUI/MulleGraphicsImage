@@ -27,8 +27,9 @@
 ## `UIImage+CGImageLayer` is abstract glue
 
 - `src/UIImage+CGImageLayer.m` fixes `canvas` and `bounds` to `(0, 0, size.width, size.height)`.
-- `isRepeating` and `drawRect:options:context:` are subclass-required there.
-- If you add a new `UIImage` subclass in this repository, implement those methods instead of relying on the base category.
+- `isRepeating` and `drawRect:options:context:` use `MULLE_OBJC_SUBCLASS_REQUIRES_IMPLEMENTATION` there.
+- `preferredImageLayerClass` in `src/UIImage+CGImageLayer.h` is `@optional`.
+- If you add a new `UIImage` subclass in this repository, implement `isRepeating` and `drawRect:options:context:` instead of relying on the base category.
 
 ## Local SVG drawing supports only a narrow option set
 
