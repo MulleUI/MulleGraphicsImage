@@ -1,8 +1,8 @@
 //
-//  UIBitmapImage+BMPWriter.m
+//  CGImage+BMPWriter.m
 //  MulleGraphicsImage
 //
-//  Copyright (c) 2021 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2025 Nat! - Mulle kybernetiK.
 //  Copyright (c) 2021 Codeon GmbH.
 //  All rights reserved.
 //

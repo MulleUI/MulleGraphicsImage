@@ -1,11 +1,12 @@
 {
    project =
    {
-      description="📸 MulleGraphicsImage defines UIImage and provides some image file formats";
+      description="🔆 Draw UIImages in layers";
       domain="github";
       language="c";
       dialect="objc";
       name="MulleGraphicsImage";
+      version="0.0.2";
       user="MulleUI";
       repo="MulleGraphicsImage";
       homepage="https://github.com/MulleUI/MulleGraphicsImage";

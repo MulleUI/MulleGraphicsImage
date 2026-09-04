@@ -2,7 +2,7 @@
 //  CGImage+UIBitmapImage.m
 //  MulleGraphicsImage
 //
-//  Copyright (c) 2024 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2022 Nat! - Mulle kybernetiK.
 //  All rights reserved.
 //
 //

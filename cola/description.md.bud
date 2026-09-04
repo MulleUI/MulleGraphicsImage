@@ -1,6 +1,4 @@
-
-# 📸 MulleUIImage
-
-#### 📸 MulleUIImage defines UIImage and provides some image file formats
-
-
+This library ties `UIImage` to the layer system and provides image file
+formats. A `UIImage` becomes a `CGDrawable` and can be drawn by a
+`CAImageLayer`, and `CGImage` as well as `UIBitmapImage` can be written out
+as PNG, BMP or GIF.

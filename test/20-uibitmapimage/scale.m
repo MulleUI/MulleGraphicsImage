@@ -8,7 +8,7 @@ int   main( int argc, char *argv[])
    UIBitmapImage          *image;
    UIBitmapImage          *scaled;
 
-   bytes = mulle_malloc( 256);
+   bytes = mulle_calloc( 1, 256);
    info  = CGBitmapInfoMakeWHRGBABytes( 8, 8);
    image = [UIBitmapImage imageWithBytes:bytes
                               bitmapInfo:info

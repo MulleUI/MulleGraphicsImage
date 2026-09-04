@@ -1,0 +1,43 @@
+## Usage
+
+Load an image from disk and draw it in a `CAImageLayer`. Because MulleGraphicsImage
+makes `UIImage` a `CGDrawable`, the layer renders it with its normal drawing
+pipeline:
+
+``` objc
+#import <MulleGraphicsImage/MulleGraphicsImage.h>
+
+static void   setupSceneInWindow( UIWindow *window)
+{
+   UIImage        *image;
+   CAImageLayer   *layer;
+
+   image = [UIImage imageWithContentsOfFileUTF8String:"parrot.png"];
+   if( ! image)
+      return;
+
+   layer = [CAImageLayer layerWithFrame:[[window contentView] contentRect]];
+   [layer setImage:image];
+
+   [[window contentView] addSubview:[UIView viewWithLayer:layer]];
+}
+```
+
+The concrete bitmap classes can also be written out in other formats:
+
+``` objc
+UIBitmapImage   *bitmap;
+
+bitmap = (UIBitmapImage *) [UIImage imageWithContentsOfFileUTF8String:"parrot.png"];
+[bitmap writeToBMPUTF8String:"parrot.bmp"];
+[bitmap writeToGIFUTF8String:"parrot.gif"];
+```
+
+## Build the demo
+
+The `demo/` folder is a [mulle-sde](//github.com/mulle-sde) project:
+
+``` sh
+cd demo
+mulle-sde craft
+```

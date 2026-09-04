@@ -1,13 +1,13 @@
 # MulleGraphicsImage
 
-#### 📸 MulleGraphicsImage defines UIImage and provides some image file formats
+Part of [MulleUI](https://github.com/MulleUI) — UIKit-shaped modular GUI libraries for mulle-objc.
 
+#### 🔆 Draw UIImages in layers
 
-# 📸 MulleUIImage
-
-#### 📸 MulleUIImage defines UIImage and provides some image file formats
-
-
+This library ties `UIImage` to the layer system and provides image file
+formats. A `UIImage` becomes a `CGDrawable` and can be drawn by a
+`CAImageLayer`, and `CGImage` as well as `UIBitmapImage` can be written out
+as PNG, BMP or GIF.
 
 
 
@@ -18,6 +18,56 @@
 
 
 
+## Documentation & Guides
+
+* [API Summary](asset/dox/api/toc)
+* [Coder Guide](asset/howto/coder/mulle-graphics-image)
+* [Debugger Guide](asset/howto/debugger/mulle-graphics-image)
+* [Verifier Guide](asset/howto/verifier/mulle-graphics-image)
+
+## Usage
+
+Load an image from disk and draw it in a `CAImageLayer`. Because MulleGraphicsImage
+makes `UIImage` a `CGDrawable`, the layer renders it with its normal drawing
+pipeline:
+
+``` objc
+#import <MulleGraphicsImage/MulleGraphicsImage.h>
+
+static void   setupSceneInWindow( UIWindow *window)
+{
+   UIImage        *image;
+   CAImageLayer   *layer;
+
+   image = [UIImage imageWithContentsOfFileUTF8String:"parrot.png"];
+   if( ! image)
+      return;
+
+   layer = [CAImageLayer layerWithFrame:[[window contentView] contentRect]];
+   [layer setImage:image];
+
+   [[window contentView] addSubview:[UIView viewWithLayer:layer]];
+}
+```
+
+The concrete bitmap classes can also be written out in other formats:
+
+``` objc
+UIBitmapImage   *bitmap;
+
+bitmap = (UIBitmapImage *) [UIImage imageWithContentsOfFileUTF8String:"parrot.png"];
+[bitmap writeToBMPUTF8String:"parrot.bmp"];
+[bitmap writeToGIFUTF8String:"parrot.gif"];
+```
+
+## Build the demo
+
+The `demo/` folder is a [mulle-sde](//github.com/mulle-sde) project:
+
+``` sh
+cd demo
+mulle-sde craft
+```
 
 
 ### You are here

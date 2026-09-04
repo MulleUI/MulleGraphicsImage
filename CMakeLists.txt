@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.15...99.99)
 
-project( MulleGraphicsImage VERSION 0.0.1 LANGUAGES C)
+project( MulleGraphicsImage VERSION 0.0.2 LANGUAGES C)
 
 #
 # Turn a "Library" into an "Executable"
