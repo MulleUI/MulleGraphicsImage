@@ -64,6 +64,5 @@ src/MulleObjCDeps+MulleGraphicsImage.h
 src/UIBitmapImage+CGImage.h
 src/UIImage+CGImageLayer.h
 src/UISVGImage+CGImage.h
-src/reflect/_MulleGraphicsImage-versioncheck.h
 )
 
