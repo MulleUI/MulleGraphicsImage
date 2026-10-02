@@ -6,7 +6,7 @@
       language="c";
       dialect="objc";
       name="MulleGraphicsImage";
-      version="0.0.2";
+      version="0.0.3";
       user="MulleUI";
       repo="MulleGraphicsImage";
       homepage="https://github.com/MulleUI/MulleGraphicsImage";
