@@ -7,9 +7,9 @@ MulleGraphicsImage defines UIImage and provides image file format support for th
 
 The primary purpose is to enable image loading, display, and export in MulleUI applications. This library is part of the MulleUI framework stack, positioned between MulleGraphics (low-level graphics) and MulleUICore (UI components).
 
-**Version macro** (current version v0.0.2):
+**Version macro** (current version v0.0.3):
 ```c
-#define MULLE_GRAPHICS_IMAGE_VERSION  ((0UL << 20) | (0 << 8) | 2)
+#define MULLE_GRAPHICS_IMAGE_VERSION  ((0UL << 20) | (0 << 8) | 3)
 ```
 
 ## 2. Key Concepts & Design Philosophy
