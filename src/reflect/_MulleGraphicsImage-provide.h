@@ -13,8 +13,7 @@
 #define _mulle_graphics_image__provide_h__
 
 
-#include "nanosvg.h"
-#include "nanosvgrast.h"
+// no headers
 
 
 #endif

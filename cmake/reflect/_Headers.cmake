@@ -14,7 +14,6 @@ set( INCLUDE_DIRS
 src/reflect
 src/generic
 src
-nanosvg/src
 )
 
 #
@@ -53,8 +52,6 @@ src/generic/import.h
 # contents selected with patternfile ??-header--public-headers
 #
 set( PUBLIC_HEADERS
-nanosvg/src/nanosvg.h
-nanosvg/src/nanosvgrast.h
 src/CGImage+BMPWriter.h
 src/CGImage+GIFWriter.h
 src/CGImage+PNGWriter.h

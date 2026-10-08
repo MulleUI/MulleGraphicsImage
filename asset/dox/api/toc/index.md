@@ -346,5 +346,5 @@ Additionally, the library depends on system libraries:
 
 Third-party libraries:
 
-- **nanosvg**: SVG file format parsing (header-only library in MulleImage, both nanosvg.h and nanosvgrast.h). Note: nanosvg is used only for parsing SVG file content into NSVGImage structures. All rendering is performed through CGContext APIs — there is no runtime rendering dependency on nanovg.
+- **nanosvg**: SVG file format parsing (header-only library in MulleImage, both nanosvg.h and nanosvgrast.h). These headers are no longer re-exported through MulleGraphicsImage's umbrella header (`_MulleGraphicsImage-provide.h` provides no headers); include them directly if needed. Note: nanosvg is used only for parsing SVG file content into NSVGImage structures. All rendering is performed through CGContext APIs — there is no runtime rendering dependency on nanovg.
 - **stb_image_write**: Image writing for GIF and BMP formats (header-only library).
